@@ -63,7 +63,7 @@ const submit = () => {
                 <InputError :message="form.errors.password_confirmation" />
             </div>
 
-            <PrimaryButton :disabled="form.processing">Reset Kata Sandi</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Reset Kata Sandi</PrimaryButton>
         </form>
     </GuestLayout>
 </template>

@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreAttributeRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user()->can('attributes.manage');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'values' => ['required', 'array', 'min:1'],
+            'values.*' => ['required', 'string', 'max:255', 'distinct'],
+        ];
+    }
+}

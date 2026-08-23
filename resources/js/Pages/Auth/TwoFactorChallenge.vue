@@ -51,7 +51,7 @@ const description = computed(() =>
                 <InputError :message="form.errors.recovery_code" />
             </div>
 
-            <PrimaryButton :disabled="form.processing">Verifikasi</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Verifikasi</PrimaryButton>
 
             <button
                 type="button"

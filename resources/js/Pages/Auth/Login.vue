@@ -61,7 +61,7 @@ const submit = () => {
                 </Link>
             </div>
 
-            <PrimaryButton :disabled="form.processing">Masuk</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Masuk</PrimaryButton>
 
             <p class="text-center text-sm text-gray-600">
                 Belum punya akun?

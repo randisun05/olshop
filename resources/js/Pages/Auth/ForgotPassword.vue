@@ -37,7 +37,7 @@ const submit = () => {
                 <InputError :message="form.errors.email" />
             </div>
 
-            <PrimaryButton :disabled="form.processing">Kirim Tautan Reset</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Kirim Tautan Reset</PrimaryButton>
         </form>
     </GuestLayout>
 </template>

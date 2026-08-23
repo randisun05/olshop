@@ -40,7 +40,7 @@ const submit = () => {
                 <InputError :message="form.errors.password" />
             </div>
 
-            <PrimaryButton :disabled="form.processing">Konfirmasi</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Konfirmasi</PrimaryButton>
         </form>
     </GuestLayout>
 </template>

@@ -3,9 +3,16 @@ import { Link, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
 
+const permissions = page.props.auth.user?.permissions ?? [];
+const hasPermission = (name) => !name || permissions.includes(name);
+
 const nav = [
     { label: 'Dashboard', route: 'admin.dashboard' },
-];
+    { label: 'Produk', route: 'admin.products.index', permission: 'products.manage' },
+    { label: 'Kategori', route: 'admin.categories.index', permission: 'categories.manage' },
+    { label: 'Brand', route: 'admin.brands.index', permission: 'brands.manage' },
+    { label: 'Atribut', route: 'admin.attributes.index', permission: 'attributes.manage' },
+].filter((item) => hasPermission(item.permission));
 </script>
 
 <template>
@@ -18,7 +25,7 @@ const nav = [
                     :key="item.route"
                     :href="route(item.route)"
                     class="block rounded px-3 py-2 text-sm hover:bg-gray-800"
-                    :class="{ 'bg-gray-800 text-white': route().current(item.route) }"
+                    :class="{ 'bg-gray-800 text-white': route().current(item.route.replace('.index', '').concat('.*')) || route().current(item.route) }"
                 >
                     {{ item.label }}
                 </Link>

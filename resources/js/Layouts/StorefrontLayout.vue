@@ -11,6 +11,7 @@ const page = usePage();
                 <Link href="/" class="text-lg font-semibold text-gray-900">Toko Online</Link>
 
                 <nav class="flex items-center gap-4 text-sm">
+                    <Link :href="route('catalog')" class="text-gray-700 hover:text-indigo-600">Produk</Link>
                     <template v-if="page.props.auth.user">
                         <Link :href="route('dashboard')" class="text-gray-700 hover:text-indigo-600">
                             Dashboard

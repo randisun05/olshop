@@ -33,7 +33,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </div>
 
         <form @submit.prevent="submit" class="flex items-center justify-between">
-            <PrimaryButton :disabled="form.processing">Kirim Ulang Email Verifikasi</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Kirim Ulang Email Verifikasi</PrimaryButton>
             <Link href="/logout" method="post" as="button" class="text-sm text-gray-600 hover:underline">
                 Keluar
             </Link>

@@ -63,7 +63,7 @@ const submit = () => {
                 <InputError :message="form.errors.password_confirmation" />
             </div>
 
-            <PrimaryButton :disabled="form.processing">Daftar</PrimaryButton>
+            <PrimaryButton class="w-full" :disabled="form.processing">Daftar</PrimaryButton>
 
             <p class="text-center text-sm text-gray-600">
                 Sudah punya akun?
