@@ -4,9 +4,17 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ShippingZoneController;
+use App\Http\Controllers\Customer\AddressController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Public\MidtransNotificationController;
+use App\Http\Controllers\Storefront\CartController;
+use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\HomeController;
+use App\Http\Controllers\Storefront\OrderController as StorefrontOrderController;
 use App\Http\Controllers\Storefront\ProductController as StorefrontProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,9 +22,25 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/produk', [StorefrontProductController::class, 'index'])->name('catalog');
 Route::get('/produk/{slug}', [StorefrontProductController::class, 'show'])->name('catalog.show');
 
+Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
+Route::post('/keranjang', [CartController::class, 'store'])->name('cart.store');
+Route::put('/keranjang/{item}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/keranjang/{item}', [CartController::class, 'destroy'])->name('cart.destroy');
+
+Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+Route::get('/pesanan/lacak', [StorefrontOrderController::class, 'lookupForm'])->name('order.lookup');
+Route::post('/pesanan/lacak', [StorefrontOrderController::class, 'lookup'])->name('order.lookup.submit');
+Route::get('/pesanan/{order}', [StorefrontOrderController::class, 'show'])->name('order.show');
+Route::post('/pesanan/{order}/bukti-bayar', [StorefrontOrderController::class, 'uploadProof'])->name('order.proof');
+Route::get('/pesanan/{order}/invoice', [StorefrontOrderController::class, 'invoice'])->name('order.invoice');
+
+Route::post('/webhook/midtrans', MidtransNotificationController::class)->name('webhook.midtrans');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        return request()->user()->hasAnyRole(['Super Admin', 'Admin', 'Staff Gudang'])
+        return request()->user()->hasAnyRole(['Super Admin', 'Admin', 'Staff Gudang', 'Staff CS'])
             ? redirect()->route('admin.dashboard')
             : redirect()->route('customer.dashboard');
     })->name('dashboard');
@@ -24,7 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'verified', 'role:Super Admin|Admin|Staff Gudang'])
+    ->middleware(['auth', 'verified', 'role:Super Admin|Admin|Staff Gudang|Staff CS'])
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
@@ -43,6 +67,16 @@ Route::prefix('admin')
         Route::middleware('permission:products.manage')->group(function () {
             Route::resource('products', AdminProductController::class)->except('show');
         });
+
+        Route::middleware('permission:shipping.manage')->group(function () {
+            Route::resource('shipping-zones', ShippingZoneController::class)->except('show', 'create', 'edit');
+        });
+
+        Route::middleware('permission:orders.manage')->group(function () {
+            Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+            Route::post('/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('payments.verify');
+            Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
+        });
     });
 
 Route::prefix('akun')
@@ -50,4 +84,10 @@ Route::prefix('akun')
     ->middleware(['auth', 'verified'])
     ->group(function () {
         Route::get('/dashboard', CustomerDashboardController::class)->name('dashboard');
+        Route::get('/pesanan', [CustomerOrderController::class, 'index'])->name('orders.index');
+
+        Route::get('/alamat', [AddressController::class, 'index'])->name('addresses.index');
+        Route::post('/alamat', [AddressController::class, 'store'])->name('addresses.store');
+        Route::put('/alamat/{address}', [AddressController::class, 'update'])->name('addresses.update');
+        Route::delete('/alamat/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     });

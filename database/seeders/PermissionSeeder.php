@@ -24,6 +24,8 @@ class PermissionSeeder extends Seeder
             'brands.manage',
             'attributes.manage',
             'products.manage',
+            'shipping.manage',
+            'orders.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -38,5 +40,8 @@ class PermissionSeeder extends Seeder
 
         $staffGudang = Role::findByName('Staff Gudang', 'web');
         $staffGudang->syncPermissions(['products.manage']);
+
+        $staffCs = Role::findByName('Staff CS', 'web');
+        $staffCs->syncPermissions(['orders.manage']);
     }
 }

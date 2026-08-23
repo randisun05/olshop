@@ -2,11 +2,14 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    public function __construct(private readonly CartService $cartService) {}
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -46,6 +49,9 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'info' => fn () => $request->session()->get('info'),
                 'warning' => fn () => $request->session()->get('warning'),
+            ],
+            'cart' => [
+                'count' => fn () => $this->cartService->currentCartItemCount($request),
             ],
         ]);
     }

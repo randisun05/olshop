@@ -12,6 +12,16 @@ const page = usePage();
 
                 <nav class="flex items-center gap-4 text-sm">
                     <Link :href="route('catalog')" class="text-gray-700 hover:text-indigo-600">Produk</Link>
+                    <Link :href="route('order.lookup')" class="text-gray-700 hover:text-indigo-600">Lacak Pesanan</Link>
+                    <Link :href="route('cart.index')" class="relative text-gray-700 hover:text-indigo-600">
+                        Keranjang
+                        <span
+                            v-if="page.props.cart.count > 0"
+                            class="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1 text-xs font-semibold text-white"
+                        >
+                            {{ page.props.cart.count }}
+                        </span>
+                    </Link>
                     <template v-if="page.props.auth.user">
                         <Link :href="route('dashboard')" class="text-gray-700 hover:text-indigo-600">
                             Dashboard

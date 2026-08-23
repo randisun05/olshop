@@ -12,6 +12,8 @@ const nav = [
     { label: 'Kategori', route: 'admin.categories.index', permission: 'categories.manage' },
     { label: 'Brand', route: 'admin.brands.index', permission: 'brands.manage' },
     { label: 'Atribut', route: 'admin.attributes.index', permission: 'attributes.manage' },
+    { label: 'Wilayah Kirim', route: 'admin.shipping-zones.index', permission: 'shipping.manage' },
+    { label: 'Pembayaran', route: 'admin.payments.index', permission: 'orders.manage' },
 ].filter((item) => hasPermission(item.permission));
 </script>
 

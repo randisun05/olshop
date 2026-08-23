@@ -44,13 +44,24 @@ Seeder membuat dua akun contoh (password: `password`):
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-1)
+## Fitur yang Sudah Tersedia (Fase 0-2)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
 - Manajemen katalog di admin: kategori (bertingkat), brand, atribut & nilai atribut, produk
   dengan banyak gambar dan banyak varian (kombinasi atribut, harga & stok per varian)
 - Katalog publik: pencarian, filter kategori, sorting, halaman detail produk dengan pemilihan varian
+- Keranjang belanja (tamu & login, otomatis digabung saat tamu login)
+- Checkout: alamat baru/tersimpan, pilih wilayah pengiriman (tarif diatur admin), catatan pesanan
+- Pembayaran: Midtrans Snap (kartu/VA/e-wallet/QRIS) atau transfer bank manual dengan unggah bukti
+- Pengurangan stok aman (row locking) saat checkout, dikembalikan otomatis bila pembayaran gagal/ditolak
+- Lacak pesanan untuk tamu (nomor pesanan + email), riwayat pesanan untuk pelanggan login
+- Invoice PDF, riwayat status pesanan
+- Admin: verifikasi/tolak pembayaran transfer manual, kelola wilayah & tarif pengiriman
 
-Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): keranjang & checkout, pembayaran,
-manajemen pesanan, diskon/kupon/promo, review, laporan.
+Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
+dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
+lalu daftarkan URL `/webhook/midtrans` sebagai Payment Notification URL di sana.
+
+Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): manajemen pesanan lanjutan (status
+pengiriman/resi), diskon/kupon/promo, review produk, laporan penjualan.

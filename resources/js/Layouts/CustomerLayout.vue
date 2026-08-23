@@ -12,6 +12,9 @@ const page = usePage();
 
                 <nav class="flex items-center gap-4 text-sm text-gray-700">
                     <Link :href="route('customer.dashboard')" class="hover:text-indigo-600">Akun Saya</Link>
+                    <Link :href="route('customer.orders.index')" class="hover:text-indigo-600">Pesanan</Link>
+                    <Link :href="route('customer.addresses.index')" class="hover:text-indigo-600">Alamat</Link>
+                    <Link :href="route('cart.index')" class="hover:text-indigo-600">Keranjang</Link>
                     <span>{{ page.props.auth.user?.name }}</span>
                     <Link :href="route('logout')" method="post" as="button" class="hover:text-indigo-600">
                         Keluar

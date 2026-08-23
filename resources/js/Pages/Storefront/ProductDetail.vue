@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 
 const props = defineProps({
@@ -12,6 +12,7 @@ const activeImage = ref(props.product.images[0]?.url ?? null);
 const selectedVariantId = ref(
     props.product.variants.find((v) => v.stock > 0)?.id ?? props.product.variants[0]?.id ?? null
 );
+const quantity = ref(1);
 
 const selectedVariant = computed(() =>
     props.product.variants.find((v) => v.id === selectedVariantId.value)
@@ -19,6 +20,17 @@ const selectedVariant = computed(() =>
 
 const formatPrice = (value) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
+
+const form = useForm({
+    product_variant_id: null,
+    quantity: 1,
+});
+
+const addToCart = () => {
+    form.product_variant_id = selectedVariant.value.id;
+    form.quantity = quantity.value;
+    form.post(route('cart.store'), { preserveScroll: true });
+};
 </script>
 
 <template>
@@ -71,14 +83,23 @@ const formatPrice = (value) =>
                     {{ selectedVariant.stock > 0 ? `Stok tersedia: ${selectedVariant.stock}` : 'Stok habis' }}
                 </p>
 
-                <button
-                    type="button"
-                    disabled
-                    title="Keranjang belanja akan tersedia pada tahap pengembangan berikutnya"
-                    class="mt-6 w-full cursor-not-allowed rounded-md bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 sm:w-72"
-                >
-                    Tambah ke Keranjang (segera hadir)
-                </button>
+                <div class="mt-6 flex items-center gap-3 sm:w-72">
+                    <input
+                        v-model.number="quantity"
+                        type="number"
+                        min="1"
+                        :max="selectedVariant?.stock ?? 1"
+                        class="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                    <button
+                        type="button"
+                        :disabled="!selectedVariant || selectedVariant.stock < 1 || form.processing"
+                        class="flex-1 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-300"
+                        @click="addToCart"
+                    >
+                        {{ selectedVariant?.stock > 0 ? 'Tambah ke Keranjang' : 'Stok Habis' }}
+                    </button>
+                </div>
 
                 <div v-if="product.description" class="mt-6 border-t pt-4 text-sm text-gray-700">
                     <h2 class="mb-2 font-semibold text-gray-900">Deskripsi</h2>
