@@ -1,14 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\AttributeController;
+use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShippingZoneController;
 use App\Http\Controllers\Customer\AddressController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
@@ -20,6 +24,7 @@ use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\CouponController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController as StorefrontOrderController;
+use App\Http\Controllers\Storefront\PageController as StorefrontPageController;
 use App\Http\Controllers\Storefront\ProductController as StorefrontProductController;
 use App\Http\Controllers\Storefront\WishlistController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/produk', [StorefrontProductController::class, 'index'])->name('catalog');
 Route::get('/produk/{slug}', [StorefrontProductController::class, 'show'])->name('catalog.show');
+Route::get('/halaman/{slug}', [StorefrontPageController::class, 'show'])->name('page.show');
 
 Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
 Route::post('/keranjang', [CartController::class, 'store'])->name('cart.store');
@@ -89,6 +95,31 @@ Route::prefix('admin')
         Route::middleware('permission:reviews.manage')->group(function () {
             Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
             Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+        });
+
+        Route::middleware('permission:banners.manage')->group(function () {
+            Route::resource('banners', BannerController::class)->except('show');
+        });
+
+        Route::middleware('permission:pages.manage')->group(function () {
+            Route::resource('pages', AdminPageController::class)->except('show');
+        });
+
+        Route::middleware('permission:settings.manage')->group(function () {
+            Route::get('/pengaturan', [SettingController::class, 'edit'])->name('settings.edit');
+            Route::put('/pengaturan', [SettingController::class, 'update'])->name('settings.update');
+        });
+
+        Route::middleware('permission:reports.view')->prefix('laporan')->name('reports.')->group(function () {
+            Route::get('/penjualan', [ReportController::class, 'sales'])->name('sales');
+            Route::get('/penjualan/export/excel', [ReportController::class, 'salesExportExcel'])->name('sales.export.excel');
+            Route::get('/penjualan/export/pdf', [ReportController::class, 'salesExportPdf'])->name('sales.export.pdf');
+
+            Route::get('/produk-terlaris', [ReportController::class, 'topProducts'])->name('top-products');
+            Route::get('/produk-terlaris/export/excel', [ReportController::class, 'topProductsExportExcel'])->name('top-products.export.excel');
+
+            Route::get('/stok', [ReportController::class, 'stock'])->name('stock');
+            Route::get('/stok/export/excel', [ReportController::class, 'stockExportExcel'])->name('stock.export.excel');
         });
 
         Route::middleware('permission:orders.manage')->group(function () {

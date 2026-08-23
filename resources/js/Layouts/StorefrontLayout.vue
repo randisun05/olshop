@@ -8,7 +8,7 @@ const page = usePage();
     <div class="min-h-screen bg-gray-50">
         <header class="border-b bg-white">
             <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-                <Link href="/" class="text-lg font-semibold text-gray-900">Toko Online</Link>
+                <Link href="/" class="text-lg font-semibold text-gray-900">{{ page.props.storeSettings.name }}</Link>
 
                 <nav class="flex items-center gap-4 text-sm">
                     <Link :href="route('catalog')" class="text-gray-700 hover:text-indigo-600">Produk</Link>
@@ -41,5 +41,21 @@ const page = usePage();
         <main class="mx-auto max-w-6xl px-4 py-8">
             <slot />
         </main>
+
+        <footer class="mt-8 border-t bg-white">
+            <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+                <p>&copy; {{ new Date().getFullYear() }} {{ page.props.storeSettings.name }}</p>
+                <nav v-if="page.props.footerPages.length" class="flex flex-wrap gap-4">
+                    <Link
+                        v-for="p in page.props.footerPages"
+                        :key="p.slug"
+                        :href="route('page.show', p.slug)"
+                        class="hover:text-indigo-600"
+                    >
+                        {{ p.title }}
+                    </Link>
+                </nav>
+            </div>
+        </footer>
     </div>
 </template>

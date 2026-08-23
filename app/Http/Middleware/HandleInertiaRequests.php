@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Page;
+use App\Models\Setting;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -53,6 +55,10 @@ class HandleInertiaRequests extends Middleware
             'cart' => [
                 'count' => fn () => $this->cartService->currentCartItemCount($request),
             ],
+            'storeSettings' => [
+                'name' => fn () => Setting::get('store_name', 'Toko Online'),
+            ],
+            'footerPages' => fn () => Page::where('is_active', true)->orderBy('title')->get(['title', 'slug']),
         ]);
     }
 }

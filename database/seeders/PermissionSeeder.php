@@ -28,6 +28,10 @@ class PermissionSeeder extends Seeder
             'orders.manage',
             'coupons.manage',
             'reviews.manage',
+            'reports.view',
+            'banners.manage',
+            'pages.manage',
+            'settings.manage',
         ];
 
         foreach ($permissions as $permission) {

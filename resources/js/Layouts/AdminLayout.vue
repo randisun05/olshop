@@ -17,6 +17,12 @@ const nav = [
     { label: 'Pembayaran', route: 'admin.payments.index', permission: 'orders.manage' },
     { label: 'Kupon', route: 'admin.coupons.index', permission: 'coupons.manage' },
     { label: 'Ulasan', route: 'admin.reviews.index', permission: 'reviews.manage' },
+    { label: 'Laporan Penjualan', route: 'admin.reports.sales', permission: 'reports.view' },
+    { label: 'Produk Terlaris', route: 'admin.reports.top-products', permission: 'reports.view' },
+    { label: 'Laporan Stok', route: 'admin.reports.stock', permission: 'reports.view' },
+    { label: 'Banner', route: 'admin.banners.index', permission: 'banners.manage' },
+    { label: 'Halaman', route: 'admin.pages.index', permission: 'pages.manage' },
+    { label: 'Pengaturan', route: 'admin.settings.edit', permission: 'settings.manage' },
 ].filter((item) => hasPermission(item.permission));
 </script>
 

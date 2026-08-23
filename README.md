@@ -44,7 +44,7 @@ Seeder membuat dua akun contoh (password: `password`):
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-4)
+## Fitur yang Sudah Tersedia (Fase 0-5)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -69,6 +69,14 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
 - Review & rating: pelanggan bisa mengulas produk yang sudah dibeli & pesanannya selesai (satu
   ulasan per item pesanan), rating rata-rata tampil di katalog & halaman detail produk, admin bisa
   moderasi (hapus) ulasan
+- Dashboard analitik admin: ringkasan omzet & pesanan bulan berjalan, grafik tren penjualan 30 hari
+  (Chart.js), produk terlaris, dan daftar varian stok menipis
+- Laporan: penjualan per periode (filter tanggal), produk terlaris per periode, dan stok — masing-
+  masing bisa diekspor ke Excel (`maatwebsite/excel`), laporan penjualan juga bisa diekspor PDF
+- Manajemen konten: banner beranda (gambar, tautan, urutan tampil) dan halaman statis (mis. FAQ,
+  syarat & ketentuan) yang bisa diakses publik di `/halaman/{slug}` dan tampil otomatis di footer
+- Pengaturan toko: identitas (nama, email, telepon, alamat), rekening bank untuk transfer manual,
+  pajak, dan ambang batas stok menipis — tersimpan sebagai key-value dan di-cache
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -76,5 +84,5 @@ lalu daftarkan URL `/webhook/midtrans` sebagai Payment Notification URL di sana.
 notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi hanya dicatat
 ke `storage/logs/laravel.log`).
 
-Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): laporan/dashboard analitik, manajemen
-konten (banner/halaman statis).
+Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): audit keamanan menyeluruh, uji beban,
+deployment guide (Fase 6 — Pengerasan).
