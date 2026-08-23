@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 
 const props = defineProps({
@@ -9,7 +9,20 @@ const props = defineProps({
     filters: Object,
 });
 
+const page = usePage();
+const isLoggedIn = () => !!page.props.auth.user;
+
 const search = ref(props.filters.q ?? '');
+
+const toggleWishlist = (product) => {
+    if (!isLoggedIn()) {
+        router.visit(route('login'));
+
+        return;
+    }
+
+    router.post(route('wishlist.toggle', product.id), {}, { preserveScroll: true });
+};
 
 const formatPrice = (value) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
@@ -94,26 +107,34 @@ const applySort = (event) => {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                    <Link
-                        v-for="product in products.data"
-                        :key="product.id"
-                        :href="route('catalog.show', product.slug)"
-                        class="group rounded-lg bg-white p-3 shadow transition hover:shadow-md"
-                    >
-                        <div class="aspect-square overflow-hidden rounded bg-gray-100">
-                            <img
-                                v-if="product.image_url"
-                                :src="product.image_url"
-                                class="h-full w-full object-cover transition group-hover:scale-105"
-                            />
-                            <div v-else class="flex h-full items-center justify-center text-xs text-gray-400">
-                                Tidak ada gambar
+                    <div v-for="product in products.data" :key="product.id" class="group relative rounded-lg bg-white p-3 shadow transition hover:shadow-md">
+                        <button
+                            type="button"
+                            class="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-1.5 text-gray-400 shadow hover:text-red-500"
+                            title="Tambah ke wishlist"
+                            @click.prevent="toggleWishlist(product)"
+                        >
+                            ♥
+                        </button>
+                        <Link :href="route('catalog.show', product.slug)">
+                            <div class="aspect-square overflow-hidden rounded bg-gray-100">
+                                <img
+                                    v-if="product.image_url"
+                                    :src="product.image_url"
+                                    class="h-full w-full object-cover transition group-hover:scale-105"
+                                />
+                                <div v-else class="flex h-full items-center justify-center text-xs text-gray-400">
+                                    Tidak ada gambar
+                                </div>
                             </div>
-                        </div>
-                        <h3 class="mt-2 line-clamp-2 text-sm font-medium text-gray-900">{{ product.name }}</h3>
-                        <p class="mt-1 text-sm font-semibold text-indigo-600">{{ priceLabel(product) }}</p>
-                        <p v-if="!product.in_stock" class="mt-1 text-xs text-red-500">Stok habis</p>
-                    </Link>
+                            <h3 class="mt-2 line-clamp-2 text-sm font-medium text-gray-900">{{ product.name }}</h3>
+                            <p class="mt-1 text-sm font-semibold text-indigo-600">{{ priceLabel(product) }}</p>
+                            <p v-if="product.reviews_count" class="mt-0.5 text-xs text-gray-500">
+                                ★ {{ product.rating_avg }} ({{ product.reviews_count }})
+                            </p>
+                            <p v-if="!product.in_stock" class="mt-1 text-xs text-red-500">Stok habis</p>
+                        </Link>
+                    </div>
                 </div>
 
                 <div v-if="products.data.length === 0" class="rounded-lg bg-white p-10 text-center text-gray-500 shadow">

@@ -40,6 +40,7 @@ class StoreOrderRequest extends FormRequest
             'shipping_zone_id' => ['required', Rule::exists('shipping_zones', 'id')->where('is_active', true)],
             'payment_method' => ['required', Rule::in(['midtrans', 'manual_transfer'])],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'coupon_code' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

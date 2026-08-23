@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Enums\PaymentMethod;
+use App\Exceptions\CouponInvalidException;
 use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\StoreOrderRequest;
@@ -84,8 +85,9 @@ class CheckoutController extends Controller
                     'phone' => $request->validated('guest_phone'),
                 ],
                 notes: $request->validated('notes'),
+                couponCode: $request->validated('coupon_code') ?: null,
             );
-        } catch (InsufficientStockException $e) {
+        } catch (InsufficientStockException|CouponInvalidException $e) {
             return back()->with('error', $e->getMessage());
         }
 

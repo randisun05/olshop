@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Exceptions\CouponInvalidException;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Cart;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Models\ShippingZone;
@@ -21,6 +23,7 @@ class CheckoutService
      * @param  array{name: ?string, email: ?string, phone: ?string}  $guest
      *
      * @throws InsufficientStockException
+     * @throws CouponInvalidException
      */
     public function placeOrder(
         Cart $cart,
@@ -30,8 +33,9 @@ class CheckoutService
         ?User $user,
         array $guest = [],
         ?string $notes = null,
+        ?string $couponCode = null,
     ): Order {
-        return DB::transaction(function () use ($cart, $shippingAddress, $shippingZone, $paymentMethod, $user, $guest, $notes) {
+        return DB::transaction(function () use ($cart, $shippingAddress, $shippingZone, $paymentMethod, $user, $guest, $notes, $couponCode) {
             $cart->loadMissing('items');
 
             if ($cart->items->isEmpty()) {
@@ -67,7 +71,20 @@ class CheckoutService
                 $variant->decrement('stock', $cartItem->quantity);
             }
 
-            $total = $subtotal + $shippingZone->cost;
+            $coupon = null;
+            $discount = 0;
+
+            if ($couponCode) {
+                $coupon = Coupon::where('code', $couponCode)->lockForUpdate()->first();
+
+                if (! $coupon || ! $coupon->isValidFor($subtotal)) {
+                    throw new CouponInvalidException;
+                }
+
+                $discount = $coupon->calculateDiscount($subtotal);
+            }
+
+            $total = $subtotal - $discount + $shippingZone->cost;
 
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
@@ -84,12 +101,18 @@ class CheckoutService
                 'shipping_zone_name' => $shippingZone->name,
                 'shipping_cost' => $shippingZone->cost,
                 'subtotal' => $subtotal,
+                'discount' => $discount,
                 'total' => $total,
                 'notes' => $notes,
             ]);
 
             foreach ($orderItemsData as $itemData) {
                 $order->items()->create($itemData);
+            }
+
+            if ($coupon) {
+                $coupon->usages()->create(['order_id' => $order->id, 'user_id' => $user?->id]);
+                $coupon->increment('used_count');
             }
 
             $order->payment()->create([

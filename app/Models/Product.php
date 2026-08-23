@@ -50,6 +50,16 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     public function minPrice(): ?float
     {
         return $this->variants->min('price');

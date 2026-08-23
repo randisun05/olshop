@@ -41,7 +41,7 @@ class OrderController extends Controller
     {
         $this->authorizeOrder($request, $order);
 
-        $order->load('items', 'payment', 'shipment', 'statusHistories');
+        $order->load('items.review', 'payment', 'shipment', 'statusHistories');
 
         return Inertia::render('Storefront/OrderDetail', [
             'order' => $this->transform($order),
@@ -120,11 +120,14 @@ class OrderController extends Controller
                 'shipped_at' => $order->shipment->shipped_at?->toIso8601String(),
             ] : null,
             'items' => $order->items->map(fn ($item) => [
+                'id' => $item->id,
                 'product_name' => $item->product_name,
                 'variant_label' => $item->variant_label,
                 'price' => $item->price,
                 'quantity' => $item->quantity,
                 'subtotal' => $item->subtotal,
+                'can_review' => $order->status->value === 'completed' && $item->product_id && ! $item->review,
+                'reviewed' => (bool) $item->review,
             ]),
             'payment' => $order->payment ? [
                 'method' => $order->payment->method->value,

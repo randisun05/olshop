@@ -44,7 +44,7 @@ Seeder membuat dua akun contoh (password: `password`):
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-3)
+## Fitur yang Sudah Tersedia (Fase 0-4)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -63,6 +63,12 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
 - Lacak pesanan untuk tamu (nomor pesanan + email), riwayat pesanan untuk pelanggan login
 - Invoice PDF, riwayat status pesanan lengkap dengan siapa yang mengubah
 - Admin: verifikasi/tolak pembayaran transfer manual, kelola wilayah & tarif pengiriman
+- Kupon/diskon: admin kelola kode kupon (persen/nominal, minimum belanja, kuota, masa berlaku),
+  pelanggan menerapkannya saat checkout dengan validasi & perhitungan diskon di server
+- Wishlist: pelanggan login bisa menyimpan/menghapus produk favorit dan melihatnya di halaman akun
+- Review & rating: pelanggan bisa mengulas produk yang sudah dibeli & pesanannya selesai (satu
+  ulasan per item pesanan), rating rata-rata tampil di katalog & halaman detail produk, admin bisa
+  moderasi (hapus) ulasan
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -70,5 +76,5 @@ lalu daftarkan URL `/webhook/midtrans` sebagai Payment Notification URL di sana.
 notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi hanya dicatat
 ke `storage/logs/laravel.log`).
 
-Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): diskon/kupon/promo, review & rating
-produk, wishlist, laporan/dashboard analitik, manajemen konten (banner/halaman statis).
+Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): laporan/dashboard analitik, manajemen
+konten (banner/halaman statis).

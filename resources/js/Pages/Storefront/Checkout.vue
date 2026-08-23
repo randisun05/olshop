@@ -33,16 +33,53 @@ const form = useForm({
     shipping_zone_id: props.shippingZones[0]?.id ?? '',
     payment_method: 'manual_transfer',
     notes: '',
+    coupon_code: '',
 });
 
 const selectedZone = computed(() => props.shippingZones.find((z) => z.id === form.shipping_zone_id));
-const total = computed(() => props.subtotal + Number(selectedZone.value?.cost ?? 0));
+
+const couponDiscount = ref(0);
+const couponMessage = ref('');
+const couponChecking = ref(false);
+const couponApplied = ref(false);
+
+const total = computed(() => props.subtotal - couponDiscount.value + Number(selectedZone.value?.cost ?? 0));
 
 const formatPrice = (value) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 
+const checkCoupon = async () => {
+    if (!form.coupon_code) return;
+
+    couponChecking.value = true;
+    couponMessage.value = '';
+
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const response = await fetch(route('checkout.coupon.check'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ code: form.coupon_code }),
+        });
+        const data = await response.json();
+
+        couponMessage.value = data.message;
+        couponApplied.value = data.valid;
+        couponDiscount.value = data.valid ? data.discount : 0;
+    } finally {
+        couponChecking.value = false;
+    }
+};
+
 const submit = () => {
     form.use_saved_address = useSavedAddress.value;
+    if (!couponApplied.value) {
+        form.coupon_code = '';
+    }
     form.post(route('checkout.store'));
 };
 </script>
@@ -169,6 +206,25 @@ const submit = () => {
                 </div>
 
                 <div class="rounded-lg bg-white p-6 shadow">
+                    <InputLabel for="coupon_code" value="Kode Kupon (opsional)" />
+                    <div class="flex gap-2">
+                        <TextInput id="coupon_code" v-model="form.coupon_code" placeholder="mis. HEMAT10" @input="couponApplied = false" />
+                        <button
+                            type="button"
+                            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            :disabled="couponChecking"
+                            @click="checkCoupon"
+                        >
+                            Terapkan
+                        </button>
+                    </div>
+                    <p v-if="couponMessage" class="mt-1 text-sm" :class="couponApplied ? 'text-green-600' : 'text-red-600'">
+                        {{ couponMessage }}
+                    </p>
+                    <InputError :message="form.errors.coupon_code" />
+                </div>
+
+                <div class="rounded-lg bg-white p-6 shadow">
                     <InputLabel for="notes" value="Catatan (opsional)" />
                     <textarea
                         id="notes"
@@ -189,6 +245,10 @@ const submit = () => {
                     <div class="flex justify-between">
                         <span>Subtotal</span>
                         <span>{{ formatPrice(subtotal) }}</span>
+                    </div>
+                    <div v-if="couponApplied" class="flex justify-between text-green-600">
+                        <span>Diskon Kupon</span>
+                        <span>-{{ formatPrice(couponDiscount) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Ongkos Kirim</span>

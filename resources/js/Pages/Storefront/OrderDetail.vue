@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -50,6 +50,20 @@ const confirmReceived = () => {
     if (confirm('Konfirmasi bahwa pesanan sudah Anda terima?')) {
         confirmForm.post(route('customer.orders.confirm', props.order.order_number));
     }
+};
+
+const reviewForms = reactive({});
+const openReviewFor = ref(null);
+
+const startReview = (item) => {
+    reviewForms[item.id] = useForm({ rating: 5, comment: '' });
+    openReviewFor.value = item.id;
+};
+
+const submitReview = (item) => {
+    reviewForms[item.id].post(route('customer.reviews.store', item.id), {
+        onSuccess: () => (openReviewFor.value = null),
+    });
 };
 </script>
 
@@ -104,12 +118,56 @@ const confirmReceived = () => {
 
             <div class="rounded-lg bg-white p-6 shadow">
                 <h2 class="mb-3 font-semibold text-gray-900">Item Pesanan</h2>
-                <div v-for="(item, i) in order.items" :key="i" class="flex justify-between border-b py-2 text-sm last:border-0">
-                    <span>{{ item.product_name }} ({{ item.variant_label }}) x{{ item.quantity }}</span>
-                    <span>{{ formatPrice(item.subtotal) }}</span>
+                <div v-for="(item, i) in order.items" :key="i" class="border-b py-3 text-sm last:border-0">
+                    <div class="flex justify-between">
+                        <span>{{ item.product_name }} ({{ item.variant_label }}) x{{ item.quantity }}</span>
+                        <span>{{ formatPrice(item.subtotal) }}</span>
+                    </div>
+
+                    <div v-if="item.reviewed" class="mt-1 text-xs text-green-600">✓ Sudah diulas</div>
+
+                    <button
+                        v-else-if="item.can_review && openReviewFor !== item.id"
+                        type="button"
+                        class="mt-1 text-xs text-indigo-600 hover:underline"
+                        @click="startReview(item)"
+                    >
+                        Tulis Ulasan
+                    </button>
+
+                    <form
+                        v-if="reviewForms[item.id] && openReviewFor === item.id"
+                        @submit.prevent="submitReview(item)"
+                        class="mt-2 space-y-2 rounded-md bg-gray-50 p-3"
+                    >
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700">Rating</label>
+                            <select
+                                v-model.number="reviewForms[item.id].rating"
+                                class="rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            >
+                                <option v-for="n in [5, 4, 3, 2, 1]" :key="n" :value="n">{{ n }} bintang</option>
+                            </select>
+                        </div>
+                        <textarea
+                            v-model="reviewForms[item.id].comment"
+                            rows="2"
+                            placeholder="Bagaimana produk ini menurut Anda? (opsional)"
+                            class="block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                        <div class="flex gap-2">
+                            <PrimaryButton :disabled="reviewForms[item.id].processing">Kirim Ulasan</PrimaryButton>
+                            <button type="button" class="text-sm text-gray-500 hover:underline" @click="openReviewFor = null">
+                                Batal
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 <div class="mt-3 space-y-1 text-sm text-gray-600">
                     <div class="flex justify-between"><span>Subtotal</span><span>{{ formatPrice(order.subtotal) }}</span></div>
+                    <div v-if="order.discount > 0" class="flex justify-between text-green-600">
+                        <span>Diskon</span><span>-{{ formatPrice(order.discount) }}</span>
+                    </div>
                     <div class="flex justify-between">
                         <span>Ongkos Kirim ({{ order.shipping_zone_name }})</span>
                         <span>{{ formatPrice(order.shipping_cost) }}</span>

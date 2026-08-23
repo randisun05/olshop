@@ -15,6 +15,8 @@ const nav = [
     { label: 'Atribut', route: 'admin.attributes.index', permission: 'attributes.manage' },
     { label: 'Wilayah Kirim', route: 'admin.shipping-zones.index', permission: 'shipping.manage' },
     { label: 'Pembayaran', route: 'admin.payments.index', permission: 'orders.manage' },
+    { label: 'Kupon', route: 'admin.coupons.index', permission: 'coupons.manage' },
+    { label: 'Ulasan', route: 'admin.reviews.index', permission: 'reviews.manage' },
 ].filter((item) => hasPermission(item.permission));
 </script>
 

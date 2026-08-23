@@ -3,20 +3,25 @@
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ShippingZoneController;
 use App\Http\Controllers\Customer\AddressController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Customer\ReviewController as CustomerReviewController;
 use App\Http\Controllers\Public\MidtransNotificationController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\CouponController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController as StorefrontOrderController;
 use App\Http\Controllers\Storefront\ProductController as StorefrontProductController;
+use App\Http\Controllers\Storefront\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -30,6 +35,7 @@ Route::delete('/keranjang/{item}', [CartController::class, 'destroy'])->name('ca
 
 Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/kupon', [CouponController::class, 'check'])->name('checkout.coupon.check');
 
 Route::get('/pesanan/lacak', [StorefrontOrderController::class, 'lookupForm'])->name('order.lookup');
 Route::post('/pesanan/lacak', [StorefrontOrderController::class, 'lookup'])->name('order.lookup.submit');
@@ -45,6 +51,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ? redirect()->route('admin.dashboard')
             : redirect()->route('customer.dashboard');
     })->name('dashboard');
+
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 Route::prefix('admin')
@@ -73,6 +82,15 @@ Route::prefix('admin')
             Route::resource('shipping-zones', ShippingZoneController::class)->except('show', 'create', 'edit');
         });
 
+        Route::middleware('permission:coupons.manage')->group(function () {
+            Route::resource('coupons', AdminCouponController::class)->except('show');
+        });
+
+        Route::middleware('permission:reviews.manage')->group(function () {
+            Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+            Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+        });
+
         Route::middleware('permission:orders.manage')->group(function () {
             Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
             Route::post('/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('payments.verify');
@@ -94,6 +112,7 @@ Route::prefix('akun')
         Route::get('/dashboard', CustomerDashboardController::class)->name('dashboard');
         Route::get('/pesanan', [CustomerOrderController::class, 'index'])->name('orders.index');
         Route::post('/pesanan/{order}/terima', [CustomerOrderController::class, 'confirmReceived'])->name('orders.confirm');
+        Route::post('/pesanan-item/{orderItem}/ulasan', [CustomerReviewController::class, 'store'])->name('reviews.store');
 
         Route::get('/alamat', [AddressController::class, 'index'])->name('addresses.index');
         Route::post('/alamat', [AddressController::class, 'store'])->name('addresses.store');

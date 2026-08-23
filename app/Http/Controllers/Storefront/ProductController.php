@@ -16,6 +16,8 @@ class ProductController extends Controller
         $products = Product::query()
             ->where('is_active', true)
             ->with(['images' => fn ($q) => $q->orderBy('sort_order')->limit(1), 'variants'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
             ->when($request->string('q')->toString(), fn ($q, $search) => $q->where('name', 'like', "%{$search}%"))
             ->when($request->string('category')->toString(), function ($query, $slug) {
                 $category = Category::where('slug', $slug)->first();
@@ -44,6 +46,8 @@ class ProductController extends Controller
                 'min_price' => $product->minPrice(),
                 'max_price' => $product->maxPrice(),
                 'in_stock' => $product->totalStock() > 0,
+                'rating_avg' => $product->reviews_avg_rating ? round($product->reviews_avg_rating, 1) : null,
+                'reviews_count' => $product->reviews_count,
             ]);
 
         return Inertia::render('Storefront/Catalog', [
@@ -53,11 +57,16 @@ class ProductController extends Controller
         ]);
     }
 
-    public function show(string $slug): Response
+    public function show(Request $request, string $slug): Response
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['category', 'brand', 'images', 'variants.attributeValues.attribute'])
+            ->with([
+                'category', 'brand', 'images', 'variants.attributeValues.attribute',
+                'reviews' => fn ($q) => $q->with('user:id,name')->latest(),
+            ])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
             ->firstOrFail();
 
         $related = Product::where('category_id', $product->category_id)
@@ -90,6 +99,17 @@ class ProductController extends Controller
                     'label' => $variant->label(),
                     'attribute_value_ids' => $variant->attributeValues->pluck('id'),
                 ]),
+                'rating_avg' => $product->reviews_avg_rating ? round($product->reviews_avg_rating, 1) : null,
+                'reviews_count' => $product->reviews_count,
+                'reviews' => $product->reviews->map(fn ($review) => [
+                    'user_name' => $review->user?->name ?? 'Pengguna',
+                    'rating' => $review->rating,
+                    'comment' => $review->comment,
+                    'created_at' => $review->created_at->toIso8601String(),
+                ]),
+                'is_wishlisted' => $request->user()
+                    ? $request->user()->wishlists()->where('product_id', $product->id)->exists()
+                    : false,
             ],
             'related' => $related,
         ]);

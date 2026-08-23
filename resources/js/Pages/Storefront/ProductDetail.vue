@@ -1,7 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+
+const page = usePage();
+const isLoggedIn = computed(() => !!page.props.auth.user);
 
 const props = defineProps({
     product: Object,
@@ -30,6 +33,16 @@ const addToCart = () => {
     form.product_variant_id = selectedVariant.value.id;
     form.quantity = quantity.value;
     form.post(route('cart.store'), { preserveScroll: true });
+};
+
+const toggleWishlist = () => {
+    if (!isLoggedIn.value) {
+        router.visit(route('login'));
+
+        return;
+    }
+
+    router.post(route('wishlist.toggle', props.product.id), {}, { preserveScroll: true });
 };
 </script>
 
@@ -61,8 +74,25 @@ const addToCart = () => {
             </div>
 
             <div>
-                <p v-if="product.brand" class="text-sm text-gray-500">{{ product.brand.name }}</p>
-                <h1 class="text-2xl font-bold text-gray-900">{{ product.name }}</h1>
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p v-if="product.brand" class="text-sm text-gray-500">{{ product.brand.name }}</p>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ product.name }}</h1>
+                    </div>
+                    <button
+                        type="button"
+                        class="rounded-full border p-2 text-lg"
+                        :class="product.is_wishlisted ? 'border-red-300 text-red-500' : 'border-gray-300 text-gray-400 hover:text-red-500'"
+                        title="Tambah ke wishlist"
+                        @click="toggleWishlist"
+                    >
+                        ♥
+                    </button>
+                </div>
+
+                <p v-if="product.reviews_count" class="mt-1 text-sm text-gray-600">
+                    ★ {{ product.rating_avg }} ({{ product.reviews_count }} ulasan)
+                </p>
 
                 <p class="mt-3 text-2xl font-semibold text-indigo-600">
                     {{ selectedVariant ? formatPrice(selectedVariant.price) : '-' }}
@@ -104,6 +134,25 @@ const addToCart = () => {
                 <div v-if="product.description" class="mt-6 border-t pt-4 text-sm text-gray-700">
                     <h2 class="mb-2 font-semibold text-gray-900">Deskripsi</h2>
                     <p class="whitespace-pre-line">{{ product.description }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12">
+            <h2 class="mb-4 text-lg font-semibold text-gray-900">
+                Ulasan Pembeli <span v-if="product.reviews_count">({{ product.reviews_count }})</span>
+            </h2>
+            <div v-if="product.reviews.length === 0" class="rounded-lg bg-white p-6 text-sm text-gray-500 shadow">
+                Belum ada ulasan untuk produk ini.
+            </div>
+            <div v-else class="space-y-3">
+                <div v-for="(review, i) in product.reviews" :key="i" class="rounded-lg bg-white p-4 shadow">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-900">{{ review.user_name }}</span>
+                        <span class="text-sm text-amber-500">★ {{ review.rating }}</span>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-400">{{ new Date(review.created_at).toLocaleDateString('id-ID') }}</p>
+                    <p v-if="review.comment" class="mt-2 text-sm text-gray-700">{{ review.comment }}</p>
                 </div>
             </div>
         </div>

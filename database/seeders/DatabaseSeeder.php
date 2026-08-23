@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CatalogSeeder::class,
             ShippingZoneSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 }
