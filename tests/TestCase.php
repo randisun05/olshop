@@ -11,7 +11,24 @@ use Illuminate\Testing\TestResponse;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Admin dengan 2FA yang sudah dikonfirmasi (memenuhi kebijakan wajib 2FA
+     * di EnsureTwoFactorEnabled) — cocok untuk test yang menguji fitur admin,
+     * bukan alur pengaktifan 2FA itu sendiri. Untuk itu pakai
+     * createAdminUserWithoutTwoFactor().
+     */
     protected function createAdminUser(): User
+    {
+        $this->seed(RoleSeeder::class);
+        $this->seed(PermissionSeeder::class);
+
+        $user = User::factory()->create(['two_factor_confirmed_at' => now()]);
+        $user->assignRole('Admin');
+
+        return $user;
+    }
+
+    protected function createAdminUserWithoutTwoFactor(): User
     {
         $this->seed(RoleSeeder::class);
         $this->seed(PermissionSeeder::class);

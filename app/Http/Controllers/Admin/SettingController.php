@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,6 +54,8 @@ class SettingController extends Controller
         foreach ($validated as $key => $value) {
             Setting::set($key, $value === null ? null : (string) $value);
         }
+
+        ActivityLog::record('settings.update', 'Memperbarui pengaturan toko.');
 
         return back()->with('success', 'Pengaturan berhasil disimpan.');
     }

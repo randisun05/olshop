@@ -59,6 +59,7 @@ class HandleInertiaRequests extends Middleware
                 'name' => fn () => Setting::get('store_name', 'Toko Online'),
             ],
             'footerPages' => fn () => Page::where('is_active', true)->orderBy('title')->get(['title', 'slug']),
+            'recaptchaSiteKey' => config('services.recaptcha.site_key'),
         ]);
     }
 }

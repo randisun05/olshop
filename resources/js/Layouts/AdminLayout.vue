@@ -4,7 +4,9 @@ import { Link, usePage } from '@inertiajs/vue3';
 const page = usePage();
 
 const permissions = page.props.auth.user?.permissions ?? [];
+const roles = page.props.auth.user?.roles ?? [];
 const hasPermission = (name) => !name || permissions.includes(name);
+const hasRole = (name) => !name || roles.includes(name);
 
 const nav = [
     { label: 'Dashboard', route: 'admin.dashboard' },
@@ -23,7 +25,8 @@ const nav = [
     { label: 'Banner', route: 'admin.banners.index', permission: 'banners.manage' },
     { label: 'Halaman', route: 'admin.pages.index', permission: 'pages.manage' },
     { label: 'Pengaturan', route: 'admin.settings.edit', permission: 'settings.manage' },
-].filter((item) => hasPermission(item.permission));
+    { label: 'Log Aktivitas', route: 'admin.activity-logs.index', role: 'Super Admin' },
+].filter((item) => hasPermission(item.permission) && hasRole(item.role));
 </script>
 
 <template>
@@ -48,6 +51,7 @@ const nav = [
                 <h1 class="text-base font-semibold text-gray-800"><slot name="title">Admin</slot></h1>
                 <div class="flex items-center gap-4 text-sm text-gray-600">
                     <span>{{ page.props.auth.user?.name }}</span>
+                    <Link :href="route('account.security.edit')" class="hover:text-indigo-600">Keamanan</Link>
                     <Link :href="route('logout')" method="post" as="button" class="text-red-600 hover:underline">
                         Keluar
                     </Link>

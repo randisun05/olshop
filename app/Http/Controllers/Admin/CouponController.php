@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Coupon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,6 +52,8 @@ class CouponController extends Controller
 
     public function destroy(Coupon $coupon): RedirectResponse
     {
+        ActivityLog::record('coupon.delete', "Menghapus kupon \"{$coupon->code}\".", $coupon);
+
         $coupon->delete();
 
         return back()->with('success', 'Kupon berhasil dihapus.');

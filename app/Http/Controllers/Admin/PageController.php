@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePageRequest;
 use App\Http\Requests\Admin\UpdatePageRequest;
+use App\Models\ActivityLog;
 use App\Models\Page;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -47,6 +48,8 @@ class PageController extends Controller
 
     public function destroy(Page $page): RedirectResponse
     {
+        ActivityLog::record('page.delete', "Menghapus halaman \"{$page->title}\".", $page);
+
         $page->delete();
 
         return back()->with('success', 'Halaman berhasil dihapus.');

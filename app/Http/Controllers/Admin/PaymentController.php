@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Payment;
 use App\Services\CheckoutService;
 use Illuminate\Http\RedirectResponse;
@@ -55,6 +56,8 @@ class PaymentController extends Controller
         $payment->order->recordStatus(OrderStatus::Paid, 'Pembayaran manual diverifikasi admin.', request()->user()->id);
         $payment->order->sendStatusNotification();
 
+        ActivityLog::record('payment.verify', "Memverifikasi pembayaran pesanan \"{$payment->order->order_number}\".", $payment);
+
         return back()->with('success', 'Pembayaran berhasil diverifikasi.');
     }
 
@@ -70,6 +73,8 @@ class PaymentController extends Controller
         $payment->order->recordStatus(OrderStatus::Cancelled, 'Bukti pembayaran ditolak admin, stok dikembalikan.', request()->user()->id);
         $this->checkoutService->restoreStock($payment->order->load('items'));
         $payment->order->sendStatusNotification();
+
+        ActivityLog::record('payment.reject', "Menolak pembayaran pesanan \"{$payment->order->order_number}\".", $payment);
 
         return back()->with('success', 'Pembayaran ditolak dan stok dikembalikan.');
     }

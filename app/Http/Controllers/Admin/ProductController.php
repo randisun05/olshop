@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
+use App\Models\ActivityLog;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
@@ -113,6 +114,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        ActivityLog::record('product.delete', "Menghapus produk \"{$product->name}\".", $product);
+
         $this->productService->delete($product);
 
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');

@@ -1,19 +1,44 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { onMounted } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
+const page = usePage();
+const siteKey = page.props.recaptchaSiteKey;
+
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    recaptcha_token: '',
+});
+
+onMounted(() => {
+    if (!siteKey) return;
+
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+    document.head.appendChild(script);
 });
 
 const submit = () => {
+    if (siteKey && window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+            window.grecaptcha.execute(siteKey, { action: 'register' }).then((token) => {
+                form.recaptcha_token = token;
+                form.post(route('register'), {
+                    onFinish: () => form.reset('password', 'password_confirmation'),
+                });
+            });
+        });
+        return;
+    }
+
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Order;
 use App\Services\CheckoutService;
 use Illuminate\Http\RedirectResponse;
@@ -145,6 +146,8 @@ class OrderController extends Controller
             422,
             'Pesanan pada status ini tidak dapat dibatalkan.'
         );
+
+        ActivityLog::record('order.cancel', "Membatalkan pesanan \"{$order->order_number}\".", $order);
 
         $order->recordStatus(OrderStatus::Cancelled, 'Pesanan dibatalkan oleh admin, stok dikembalikan.', request()->user()->id);
         $this->checkoutService->restoreStock($order->load('items'));

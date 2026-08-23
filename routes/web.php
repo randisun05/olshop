@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Account\SecurityController;
+use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
@@ -40,8 +42,8 @@ Route::put('/keranjang/{item}', [CartController::class, 'update'])->name('cart.u
 Route::delete('/keranjang/{item}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/checkout/kupon', [CouponController::class, 'check'])->name('checkout.coupon.check');
+Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('checkout.store');
+Route::post('/checkout/kupon', [CouponController::class, 'check'])->middleware('throttle:20,1')->name('checkout.coupon.check');
 
 Route::get('/pesanan/lacak', [StorefrontOrderController::class, 'lookupForm'])->name('order.lookup');
 Route::post('/pesanan/lacak', [StorefrontOrderController::class, 'lookup'])->name('order.lookup.submit');
@@ -49,7 +51,7 @@ Route::get('/pesanan/{order}', [StorefrontOrderController::class, 'show'])->name
 Route::post('/pesanan/{order}/bukti-bayar', [StorefrontOrderController::class, 'uploadProof'])->name('order.proof');
 Route::get('/pesanan/{order}/invoice', [StorefrontOrderController::class, 'invoice'])->name('order.invoice');
 
-Route::post('/webhook/midtrans', MidtransNotificationController::class)->name('webhook.midtrans');
+Route::post('/webhook/midtrans', MidtransNotificationController::class)->middleware('throttle:60,1')->name('webhook.midtrans');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -59,12 +61,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->middleware('throttle:30,1')->name('wishlist.toggle');
+
+    Route::prefix('akun-saya')->name('account.')->group(function () {
+        Route::get('/keamanan', [SecurityController::class, 'edit'])->name('security.edit');
+    });
 });
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'verified', 'role:Super Admin|Admin|Staff Gudang|Staff CS'])
+    ->middleware(['auth', 'verified', 'role:Super Admin|Admin|Staff Gudang|Staff CS', 'two_factor.required'])
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
@@ -134,6 +140,10 @@ Route::prefix('admin')
             Route::post('/pesanan/{order}/selesai', [AdminOrderController::class, 'markCompleted'])->name('orders.complete');
             Route::post('/pesanan/{order}/batal', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
         });
+
+        Route::middleware('role:Super Admin')->group(function () {
+            Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+        });
     });
 
 Route::prefix('akun')
@@ -143,7 +153,7 @@ Route::prefix('akun')
         Route::get('/dashboard', CustomerDashboardController::class)->name('dashboard');
         Route::get('/pesanan', [CustomerOrderController::class, 'index'])->name('orders.index');
         Route::post('/pesanan/{order}/terima', [CustomerOrderController::class, 'confirmReceived'])->name('orders.confirm');
-        Route::post('/pesanan-item/{orderItem}/ulasan', [CustomerReviewController::class, 'store'])->name('reviews.store');
+        Route::post('/pesanan-item/{orderItem}/ulasan', [CustomerReviewController::class, 'store'])->middleware('throttle:10,1')->name('reviews.store');
 
         Route::get('/alamat', [AddressController::class, 'index'])->name('addresses.index');
         Route::post('/alamat', [AddressController::class, 'store'])->name('addresses.store');

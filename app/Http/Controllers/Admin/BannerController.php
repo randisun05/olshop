@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreBannerRequest;
 use App\Http\Requests\Admin\UpdateBannerRequest;
+use App\Models\ActivityLog;
 use App\Models\Banner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -58,6 +59,8 @@ class BannerController extends Controller
 
     public function destroy(Banner $banner): RedirectResponse
     {
+        ActivityLog::record('banner.delete', "Menghapus banner \"{$banner->title}\".", $banner);
+
         Storage::disk('public')->delete($banner->image);
         $banner->delete();
 
