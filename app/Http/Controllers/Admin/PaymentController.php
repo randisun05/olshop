@@ -53,6 +53,7 @@ class PaymentController extends Controller
 
         $payment->order->update(['paid_at' => now()]);
         $payment->order->recordStatus(OrderStatus::Paid, 'Pembayaran manual diverifikasi admin.', request()->user()->id);
+        $payment->order->sendStatusNotification();
 
         return back()->with('success', 'Pembayaran berhasil diverifikasi.');
     }
@@ -68,6 +69,7 @@ class PaymentController extends Controller
 
         $payment->order->recordStatus(OrderStatus::Cancelled, 'Bukti pembayaran ditolak admin, stok dikembalikan.', request()->user()->id);
         $this->checkoutService->restoreStock($payment->order->load('items'));
+        $payment->order->sendStatusNotification();
 
         return back()->with('success', 'Pembayaran ditolak dan stok dikembalikan.');
     }

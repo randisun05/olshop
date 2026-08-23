@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ShippingZoneController;
@@ -76,6 +77,13 @@ Route::prefix('admin')
             Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
             Route::post('/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('payments.verify');
             Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
+
+            Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('orders.index');
+            Route::get('/pesanan/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+            Route::post('/pesanan/{order}/proses', [AdminOrderController::class, 'markProcessing'])->name('orders.process');
+            Route::post('/pesanan/{order}/kirim', [AdminOrderController::class, 'markShipped'])->name('orders.ship');
+            Route::post('/pesanan/{order}/selesai', [AdminOrderController::class, 'markCompleted'])->name('orders.complete');
+            Route::post('/pesanan/{order}/batal', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
         });
     });
 
@@ -85,6 +93,7 @@ Route::prefix('akun')
     ->group(function () {
         Route::get('/dashboard', CustomerDashboardController::class)->name('dashboard');
         Route::get('/pesanan', [CustomerOrderController::class, 'index'])->name('orders.index');
+        Route::post('/pesanan/{order}/terima', [CustomerOrderController::class, 'confirmReceived'])->name('orders.confirm');
 
         Route::get('/alamat', [AddressController::class, 'index'])->name('addresses.index');
         Route::post('/alamat', [AddressController::class, 'store'])->name('addresses.store');

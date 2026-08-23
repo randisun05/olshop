@@ -8,6 +8,7 @@ const hasPermission = (name) => !name || permissions.includes(name);
 
 const nav = [
     { label: 'Dashboard', route: 'admin.dashboard' },
+    { label: 'Pesanan', route: 'admin.orders.index', permission: 'orders.manage' },
     { label: 'Produk', route: 'admin.products.index', permission: 'products.manage' },
     { label: 'Kategori', route: 'admin.categories.index', permission: 'categories.manage' },
     { label: 'Brand', route: 'admin.brands.index', permission: 'brands.manage' },

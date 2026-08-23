@@ -44,7 +44,7 @@ Seeder membuat dua akun contoh (password: `password`):
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-2)
+## Fitur yang Sudah Tersedia (Fase 0-3)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -54,14 +54,21 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
 - Keranjang belanja (tamu & login, otomatis digabung saat tamu login)
 - Checkout: alamat baru/tersimpan, pilih wilayah pengiriman (tarif diatur admin), catatan pesanan
 - Pembayaran: Midtrans Snap (kartu/VA/e-wallet/QRIS) atau transfer bank manual dengan unggah bukti
-- Pengurangan stok aman (row locking) saat checkout, dikembalikan otomatis bila pembayaran gagal/ditolak
+- Pengurangan stok aman (row locking) saat checkout, dikembalikan otomatis bila pembayaran
+  gagal/ditolak/dibatalkan
+- Manajemen pesanan admin: proses pesanan (dibayar → diproses → dikirim + input resi → selesai),
+  batalkan pesanan dengan pengembalian stok otomatis
+- Notifikasi email ke pembeli (terdaftar maupun tamu) di setiap perubahan status pesanan
+- Pelanggan bisa konfirmasi sendiri "pesanan diterima" setelah status dikirim
 - Lacak pesanan untuk tamu (nomor pesanan + email), riwayat pesanan untuk pelanggan login
-- Invoice PDF, riwayat status pesanan
+- Invoice PDF, riwayat status pesanan lengkap dengan siapa yang mengubah
 - Admin: verifikasi/tolak pembayaran transfer manual, kelola wilayah & tarif pengiriman
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
-lalu daftarkan URL `/webhook/midtrans` sebagai Payment Notification URL di sana.
+lalu daftarkan URL `/webhook/midtrans` sebagai Payment Notification URL di sana. Untuk email
+notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi hanya dicatat
+ke `storage/logs/laravel.log`).
 
-Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): manajemen pesanan lanjutan (status
-pengiriman/resi), diskon/kupon/promo, review produk, laporan penjualan.
+Belum tersedia (lihat roadmap di `docs/PERENCANAAN.md`): diskon/kupon/promo, review & rating
+produk, wishlist, laporan/dashboard analitik, manajemen konten (banner/halaman statis).

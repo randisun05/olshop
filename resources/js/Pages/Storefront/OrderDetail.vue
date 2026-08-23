@@ -8,6 +8,7 @@ import InputError from '@/Components/InputError.vue';
 const props = defineProps({
     order: Object,
     email: String,
+    isOwner: Boolean,
     midtrans: Object,
 });
 
@@ -42,6 +43,14 @@ const submitProof = () => {
         forceFormData: true,
     });
 };
+
+const confirmForm = useForm({});
+
+const confirmReceived = () => {
+    if (confirm('Konfirmasi bahwa pesanan sudah Anda terima?')) {
+        confirmForm.post(route('customer.orders.confirm', props.order.order_number));
+    }
+};
 </script>
 
 <template>
@@ -75,7 +84,22 @@ const submitProof = () => {
                             Status: {{ order.payment?.status_label }}
                         </p>
                     </div>
+                    <div v-if="order.shipment">
+                        <h3 class="font-medium text-gray-900">Pengiriman</h3>
+                        <p class="text-gray-600">
+                            {{ order.shipment.courier }}<br>
+                            Resi: {{ order.shipment.tracking_number }}
+                        </p>
+                    </div>
                 </div>
+            </div>
+
+            <div v-if="order.status === 'shipped' && isOwner" class="rounded-lg bg-white p-6 shadow">
+                <h2 class="mb-1 font-semibold text-gray-900">Pesanan Sudah Dikirim</h2>
+                <p class="mb-4 text-sm text-gray-600">Sudah menerima paketnya? Konfirmasi di bawah ini.</p>
+                <PrimaryButton :disabled="confirmForm.processing" @click="confirmReceived">
+                    Konfirmasi Pesanan Diterima
+                </PrimaryButton>
             </div>
 
             <div class="rounded-lg bg-white p-6 shadow">

@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Notifications\OrderStatusUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Notification;
 
 class Order extends Model
 {
@@ -69,6 +71,11 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function shipment(): HasOne
+    {
+        return $this->hasOne(Shipment::class);
+    }
+
     public function recordStatus(OrderStatus $status, ?string $note = null, ?int $changedBy = null): void
     {
         $this->update(['status' => $status]);
@@ -78,5 +85,14 @@ class Order extends Model
             'note' => $note,
             'changed_by' => $changedBy,
         ]);
+    }
+
+    public function sendStatusNotification(): void
+    {
+        if ($this->user) {
+            $this->user->notify(new OrderStatusUpdated($this));
+        } else {
+            Notification::route('mail', $this->guest_email)->notify(new OrderStatusUpdated($this));
+        }
     }
 }

@@ -41,11 +41,12 @@ class OrderController extends Controller
     {
         $this->authorizeOrder($request, $order);
 
-        $order->load('items', 'payment', 'statusHistories');
+        $order->load('items', 'payment', 'shipment', 'statusHistories');
 
         return Inertia::render('Storefront/OrderDetail', [
             'order' => $this->transform($order),
             'email' => $request->query('email'),
+            'isOwner' => $order->user_id !== null && $order->user_id === $request->user()?->id,
             'midtrans' => [
                 'clientKey' => config('services.midtrans.client_key'),
                 'isProduction' => config('services.midtrans.is_production'),
@@ -113,6 +114,11 @@ class OrderController extends Controller
             'total' => $order->total,
             'notes' => $order->notes,
             'created_at' => $order->created_at->toIso8601String(),
+            'shipment' => $order->shipment ? [
+                'courier' => $order->shipment->courier,
+                'tracking_number' => $order->shipment->tracking_number,
+                'shipped_at' => $order->shipment->shipped_at?->toIso8601String(),
+            ] : null,
             'items' => $order->items->map(fn ($item) => [
                 'product_name' => $item->product_name,
                 'variant_label' => $item->variant_label,

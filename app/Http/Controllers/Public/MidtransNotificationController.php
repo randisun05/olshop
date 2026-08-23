@@ -59,6 +59,7 @@ class MidtransNotificationController extends Controller
         $order->payment->update(['status' => PaymentStatus::Paid, 'paid_at' => now()]);
         $order->update(['paid_at' => now()]);
         $order->recordStatus(OrderStatus::Paid, 'Pembayaran Midtrans diterima.');
+        $order->sendStatusNotification();
     }
 
     private function markFailed(Order $order, string $transactionStatus): void
