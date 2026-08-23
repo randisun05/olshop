@@ -188,13 +188,13 @@ Nama tabel & field kunci (disederhanakan, migration detail dibuat saat implement
 6. **Fase 5 — Laporan & Konten**: dashboard analitik, export Excel/PDF, manajemen banner/halaman statis, pengaturan toko.
 7. **Fase 6 — Pengerasan**: audit keamanan menyeluruh, uji beban ringan, penambahan test coverage, deployment guide.
 
-## 10. Yang Belum Diputuskan (butuh konfirmasi sebelum implementasi)
+## 10. Keputusan Final
 
-- Apakah checkout mendukung **guest checkout** (tanpa akun) atau wajib login?
-- Apakah perlu **multi-vendor** (banyak penjual dalam satu platform) atau single-store saja untuk awal? (Skema di atas didesain single-store, tapi bisa diperluas dengan `vendor_id` nullable jika multi-vendor dibutuhkan nanti.)
-- Ongkir: cukup input manual per admin dulu, atau langsung integrasi API kurir (RajaOngkir/Biteship) sejak Fase 2?
-- Skala data/traffic yang ditarget (menentukan kebutuhan Redis/queue worker sejak awal atau boleh nanti)?
+- **Guest checkout**: didukung. Pembeli bisa checkout tanpa akun (cart berbasis session), dan bisa login/register untuk riwayat pesanan, wishlist, dsb. Saat login, cart session di-merge ke cart milik akun.
+- **Model bisnis**: single-store (satu admin/owner mengelola semua produk). Skema tetap didesain agar mudah diperluas ke multi-vendor nanti (mis. tambah `vendor_id` nullable di `products`/`orders` tanpa merombak skema inti).
+- **Ongkir**: manual dulu — admin set tarif per kota/berat di Fase 2. Titik ekstensi untuk integrasi API kurir (RajaOngkir/Biteship) disiapkan di `ShippingService` agar tinggal ganti implementasi saat dibutuhkan.
+- **Skala/infra**: mulai dengan queue driver `database` dan cache `file` (cukup untuk MVP & mudah dijalankan di shared hosting), dengan kode ditulis agar tinggal ganti config ke Redis saat traffic naik (tidak ada perubahan logika aplikasi).
 
 ---
 
-Setelah rencana ini disetujui/disesuaikan, langkah berikutnya adalah eksekusi **Fase 0** (scaffolding project Laravel + Inertia + Vue).
+Rencana disetujui. Lanjut ke eksekusi **Fase 0** (scaffolding project Laravel + Inertia + Vue).
