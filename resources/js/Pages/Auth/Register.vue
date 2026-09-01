@@ -9,6 +9,8 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const page = usePage();
 const siteKey = page.props.recaptchaSiteKey;
+const socialProviders = page.props.socialProviders ?? [];
+const providerLabels = { google: 'Google' };
 
 const form = useForm({
     name: '',
@@ -95,5 +97,21 @@ const submit = () => {
                 <Link href="/login" class="text-indigo-600 hover:underline">Masuk</Link>
             </p>
         </form>
+
+        <template v-if="socialProviders.length">
+            <div class="my-4 flex items-center gap-3 text-xs text-gray-400">
+                <span class="h-px flex-1 bg-gray-200"></span>
+                atau
+                <span class="h-px flex-1 bg-gray-200"></span>
+            </div>
+            <a
+                v-for="provider in socialProviders"
+                :key="provider"
+                :href="route('social.redirect', provider)"
+                class="block w-full rounded-md border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+                Daftar dengan {{ providerLabels[provider] ?? provider }}
+            </a>
+        </template>
     </GuestLayout>
 </template>

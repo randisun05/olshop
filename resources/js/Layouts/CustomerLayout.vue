@@ -13,6 +13,7 @@ const page = usePage();
                 <nav class="flex items-center gap-4 text-sm text-gray-700">
                     <Link :href="route('customer.dashboard')" class="hover:text-indigo-600">Akun Saya</Link>
                     <Link :href="route('customer.orders.index')" class="hover:text-indigo-600">Pesanan</Link>
+                    <Link :href="route('customer.complaints.index')" class="hover:text-indigo-600">Retur/Komplain</Link>
                     <Link :href="route('customer.addresses.index')" class="hover:text-indigo-600">Alamat</Link>
                     <Link :href="route('wishlist.index')" class="hover:text-indigo-600">Wishlist</Link>
                     <Link :href="route('cart.index')" class="hover:text-indigo-600">Keranjang</Link>

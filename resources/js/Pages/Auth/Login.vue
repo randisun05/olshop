@@ -1,10 +1,14 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+
+const page = usePage();
+const socialProviders = page.props.socialProviders ?? [];
+const providerLabels = { google: 'Google' };
 
 const form = useForm({
     email: '',
@@ -68,5 +72,21 @@ const submit = () => {
                 <Link href="/register" class="text-indigo-600 hover:underline">Daftar</Link>
             </p>
         </form>
+
+        <template v-if="socialProviders.length">
+            <div class="my-4 flex items-center gap-3 text-xs text-gray-400">
+                <span class="h-px flex-1 bg-gray-200"></span>
+                atau
+                <span class="h-px flex-1 bg-gray-200"></span>
+            </div>
+            <a
+                v-for="provider in socialProviders"
+                :key="provider"
+                :href="route('social.redirect', provider)"
+                class="block w-full rounded-md border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+                Masuk dengan {{ providerLabels[provider] ?? provider }}
+            </a>
+        </template>
     </GuestLayout>
 </template>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -16,7 +17,9 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShippingZoneController;
+use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Customer\AddressController;
+use App\Http\Controllers\Customer\ComplaintController as CustomerComplaintController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ReviewController as CustomerReviewController;
@@ -52,6 +55,11 @@ Route::post('/pesanan/{order}/bukti-bayar', [StorefrontOrderController::class, '
 Route::get('/pesanan/{order}/invoice', [StorefrontOrderController::class, 'invoice'])->name('order.invoice');
 
 Route::post('/webhook/midtrans', MidtransNotificationController::class)->middleware('throttle:60,1')->name('webhook.midtrans');
+
+Route::middleware('guest')->prefix('auth')->name('social.')->group(function () {
+    Route::get('/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('redirect');
+    Route::get('/{provider}/callback', [SocialAuthController::class, 'callback'])->name('callback');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -144,6 +152,12 @@ Route::prefix('admin')
         Route::middleware('role:Super Admin')->group(function () {
             Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('activity-logs.index');
         });
+
+        Route::middleware('permission:complaints.manage')->group(function () {
+            Route::get('/komplain', [AdminComplaintController::class, 'index'])->name('complaints.index');
+            Route::get('/komplain/{complaint}', [AdminComplaintController::class, 'show'])->name('complaints.show');
+            Route::post('/komplain/{complaint}/respon', [AdminComplaintController::class, 'respond'])->name('complaints.respond');
+        });
     });
 
 Route::prefix('akun')
@@ -154,6 +168,10 @@ Route::prefix('akun')
         Route::get('/pesanan', [CustomerOrderController::class, 'index'])->name('orders.index');
         Route::post('/pesanan/{order}/terima', [CustomerOrderController::class, 'confirmReceived'])->name('orders.confirm');
         Route::post('/pesanan-item/{orderItem}/ulasan', [CustomerReviewController::class, 'store'])->middleware('throttle:10,1')->name('reviews.store');
+
+        Route::get('/komplain', [CustomerComplaintController::class, 'index'])->name('complaints.index');
+        Route::get('/pesanan/{order}/komplain', [CustomerComplaintController::class, 'create'])->name('complaints.create');
+        Route::post('/pesanan/{order}/komplain', [CustomerComplaintController::class, 'store'])->middleware('throttle:5,1')->name('complaints.store');
 
         Route::get('/alamat', [AddressController::class, 'index'])->name('addresses.index');
         Route::post('/alamat', [AddressController::class, 'store'])->name('addresses.store');

@@ -13,6 +13,7 @@
         "intervention/image-laravel": "^4.1",
         "laravel/fortify": "^1.38",
         "laravel/framework": "^13.17",
+        "laravel/socialite": "^5.30",
         "laravel/tinker": "^3.0",
         "maatwebsite/excel": "^4.0",
         "midtrans/midtrans-php": "^2.6",

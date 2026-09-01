@@ -76,6 +76,11 @@ class Order extends Model
         return $this->hasOne(Shipment::class);
     }
 
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
     public function recordStatus(OrderStatus $status, ?string $note = null, ?int $changedBy = null): void
     {
         $this->update(['status' => $status]);

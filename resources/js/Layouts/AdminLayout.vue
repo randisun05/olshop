@@ -19,6 +19,7 @@ const nav = [
     { label: 'Pembayaran', route: 'admin.payments.index', permission: 'orders.manage' },
     { label: 'Kupon', route: 'admin.coupons.index', permission: 'coupons.manage' },
     { label: 'Ulasan', route: 'admin.reviews.index', permission: 'reviews.manage' },
+    { label: 'Retur/Komplain', route: 'admin.complaints.index', permission: 'complaints.manage' },
     { label: 'Laporan Penjualan', route: 'admin.reports.sales', permission: 'reports.view' },
     { label: 'Produk Terlaris', route: 'admin.reports.top-products', permission: 'reports.view' },
     { label: 'Laporan Stok', route: 'admin.reports.stock', permission: 'reports.view' },

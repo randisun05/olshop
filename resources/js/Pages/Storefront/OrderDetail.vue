@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputError from '@/Components/InputError.vue';
@@ -9,6 +9,7 @@ const props = defineProps({
     order: Object,
     email: String,
     isOwner: Boolean,
+    canFileComplaint: Boolean,
     midtrans: Object,
 });
 
@@ -114,6 +115,14 @@ const submitReview = (item) => {
                 <PrimaryButton :disabled="confirmForm.processing" @click="confirmReceived">
                     Konfirmasi Pesanan Diterima
                 </PrimaryButton>
+            </div>
+
+            <div v-if="canFileComplaint" class="rounded-lg bg-white p-6 shadow">
+                <h2 class="mb-1 font-semibold text-gray-900">Ada Masalah dengan Pesanan Ini?</h2>
+                <p class="mb-4 text-sm text-gray-600">Ajukan retur atau komplain jika produk tidak sesuai, rusak, atau ada kendala lain.</p>
+                <Link :href="route('customer.complaints.create', order.order_number)">
+                    <PrimaryButton type="button">Ajukan Retur/Komplain</PrimaryButton>
+                </Link>
             </div>
 
             <div class="rounded-lg bg-white p-6 shadow">

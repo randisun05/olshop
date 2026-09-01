@@ -60,6 +60,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'footerPages' => fn () => Page::where('is_active', true)->orderBy('title')->get(['title', 'slug']),
             'recaptchaSiteKey' => config('services.recaptcha.site_key'),
+            'socialProviders' => array_values(array_filter([
+                config('services.google.client_id') ? 'google' : null,
+            ])),
         ]);
     }
 }

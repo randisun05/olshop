@@ -50,7 +50,7 @@ admin lainnya — ini yang diharapkan (bukan bug), lihat § Pengerasan Keamanan 
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-6)
+## Fitur yang Sudah Tersedia (Fase 0-7)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -90,6 +90,12 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   aksi kritikal (hapus produk/kupon/banner/halaman, verifikasi/tolak pembayaran, batalkan pesanan,
   ubah pengaturan toko — bisa dilihat Super Admin di `/admin/log-aktivitas`), dan hook reCAPTCHA v3
   opsional di form registrasi (tidak aktif tanpa `RECAPTCHA_SECRET_KEY`)
+- Retur/komplain: pelanggan bisa mengajukan retur/komplain (dengan foto bukti opsional) untuk
+  pesanan yang sudah selesai, satu pengajuan terbuka per pesanan, admin/Staff CS meninjau &
+  merespons (proses/selesai/tolak + catatan) dan pelanggan mendapat notifikasi email
+- Login sosial: tombol "Masuk/Daftar dengan Google" opsional (tidak aktif tanpa
+  `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`) — akun baru otomatis dibuat & email terverifikasi,
+  atau ditautkan ke akun existing bila emailnya sudah terdaftar
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -97,7 +103,6 @@ lalu daftarkan URL `/webhook/midtrans` sebagai Payment Notification URL di sana.
 notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi hanya dicatat
 ke `storage/logs/laravel.log`).
 
-Seluruh 7 fase di roadmap `docs/PERENCANAAN.md` § 9 sudah selesai. Fitur yang disebut di § 6
-namun belum diimplementasikan (di luar cakupan fase manapun secara eksplisit): retur/komplain
-sederhana, login sosial, dan ekstensi multi-vendor (skema sudah didesain agar mudah ditambah
-tanpa merombak struktur inti — lihat § 10).
+Seluruh 7 fase di roadmap `docs/PERENCANAAN.md` § 9 sudah selesai, ditambah Fase 7 (retur/komplain
+& login sosial) atas permintaan lanjutan. Satu-satunya item di § 6 yang masih terbuka: ekstensi
+multi-vendor (skema sudah didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Storefront;
 
+use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
@@ -41,12 +42,16 @@ class OrderController extends Controller
     {
         $this->authorizeOrder($request, $order);
 
-        $order->load('items.review', 'payment', 'shipment', 'statusHistories');
+        $order->load('items.review', 'payment', 'shipment', 'statusHistories', 'complaints');
+
+        $isOwner = $order->user_id !== null && $order->user_id === $request->user()?->id;
+        $hasOpenComplaint = $order->complaints->contains(fn ($c) => $c->status->isOpen());
 
         return Inertia::render('Storefront/OrderDetail', [
             'order' => $this->transform($order),
             'email' => $request->query('email'),
-            'isOwner' => $order->user_id !== null && $order->user_id === $request->user()?->id,
+            'isOwner' => $isOwner,
+            'canFileComplaint' => $isOwner && $order->status === OrderStatus::Completed && ! $hasOpenComplaint,
             'midtrans' => [
                 'clientKey' => config('services.midtrans.client_key'),
                 'isProduction' => config('services.midtrans.is_production'),
