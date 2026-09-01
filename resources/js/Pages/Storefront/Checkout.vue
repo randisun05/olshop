@@ -10,6 +10,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 const props = defineProps({
     items: Array,
     subtotal: Number,
+    taxPercent: Number,
     shippingZones: Array,
     addresses: Array,
 });
@@ -43,7 +44,8 @@ const couponMessage = ref('');
 const couponChecking = ref(false);
 const couponApplied = ref(false);
 
-const total = computed(() => props.subtotal - couponDiscount.value + Number(selectedZone.value?.cost ?? 0));
+const taxAmount = computed(() => Math.round((props.subtotal - couponDiscount.value) * (props.taxPercent / 100)));
+const total = computed(() => props.subtotal - couponDiscount.value + taxAmount.value + Number(selectedZone.value?.cost ?? 0));
 
 const formatPrice = (value) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
@@ -249,6 +251,10 @@ const submit = () => {
                     <div v-if="couponApplied" class="flex justify-between text-green-600">
                         <span>Diskon Kupon</span>
                         <span>-{{ formatPrice(couponDiscount) }}</span>
+                    </div>
+                    <div v-if="taxPercent > 0" class="flex justify-between">
+                        <span>Pajak ({{ taxPercent }}%)</span>
+                        <span>{{ formatPrice(taxAmount) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Ongkos Kirim</span>

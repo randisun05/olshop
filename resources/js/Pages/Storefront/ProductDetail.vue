@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import Seo from '@/Components/Seo.vue';
 
 const page = usePage();
 const isLoggedIn = computed(() => !!page.props.auth.user);
@@ -9,6 +10,7 @@ const isLoggedIn = computed(() => !!page.props.auth.user);
 const props = defineProps({
     product: Object,
     related: Array,
+    seo: Object,
 });
 
 const activeImage = ref(props.product.images[0]?.url ?? null);
@@ -47,7 +49,7 @@ const toggleWishlist = () => {
 </script>
 
 <template>
-    <Head :title="product.name" />
+    <Seo :seo="seo" />
 
     <StorefrontLayout>
         <nav class="mb-4 text-sm text-gray-500">

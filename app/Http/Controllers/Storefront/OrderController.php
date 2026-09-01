@@ -116,6 +116,7 @@ class OrderController extends Controller
             'shipping_cost' => $order->shipping_cost,
             'subtotal' => $order->subtotal,
             'discount' => $order->discount,
+            'tax' => $order->tax,
             'total' => $order->total,
             'notes' => $order->notes,
             'created_at' => $order->created_at->toIso8601String(),

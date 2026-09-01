@@ -53,6 +53,9 @@
         @if ($order->discount > 0)
             <tr><td>Diskon</td><td class="text-right">-Rp{{ number_format($order->discount, 0, ',', '.') }}</td></tr>
         @endif
+        @if ($order->tax > 0)
+            <tr><td>Pajak</td><td class="text-right">Rp{{ number_format($order->tax, 0, ',', '.') }}</td></tr>
+        @endif
         <tr><td>Total</td><td class="text-right">Rp{{ number_format($order->total, 0, ',', '.') }}</td></tr>
     </table>
 </body>

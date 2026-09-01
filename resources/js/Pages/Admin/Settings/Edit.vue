@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -8,7 +9,10 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     settings: Object,
+    logoUrl: String,
 });
+
+const logoPreview = ref(props.logoUrl);
 
 const form = useForm({
     store_name: props.settings.store_name ?? '',
@@ -20,10 +24,19 @@ const form = useForm({
     bank_account_holder: props.settings.bank_account_holder ?? '',
     tax_percent: props.settings.tax_percent ?? '',
     low_stock_threshold: props.settings.low_stock_threshold ?? 5,
+    logo: null,
 });
 
+const onLogoChange = (event) => {
+    const file = event.target.files[0];
+    form.logo = file ?? null;
+    logoPreview.value = file ? URL.createObjectURL(file) : props.logoUrl;
+};
+
 const submit = () => {
-    form.put(route('admin.settings.update'));
+    form.transform((data) => ({ ...data, _method: 'put' })).post(route('admin.settings.update'), {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -63,6 +76,12 @@ const submit = () => {
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         ></textarea>
                         <InputError :message="form.errors.store_address" />
+                    </div>
+                    <div>
+                        <InputLabel for="logo" value="Logo Toko (opsional)" />
+                        <img v-if="logoPreview" :src="logoPreview" class="mb-2 h-16 w-16 rounded object-cover" />
+                        <input id="logo" type="file" accept="image/*" @change="onLogoChange" class="block text-sm" />
+                        <InputError :message="form.errors.logo" />
                     </div>
                 </div>
             </div>

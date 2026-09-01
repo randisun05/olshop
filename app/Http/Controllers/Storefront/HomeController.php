@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Support\SeoMeta;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,6 +16,7 @@ class HomeController extends Controller
             'banners' => Banner::where('is_active', true)
                 ->orderBy('sort_order')
                 ->get(['id', 'title', 'image', 'link_url']),
+            'seo' => SeoMeta::make('Beranda', 'Belanja online produk pilihan dengan harga terbaik, pengiriman ke seluruh Indonesia.'),
         ]);
     }
 }

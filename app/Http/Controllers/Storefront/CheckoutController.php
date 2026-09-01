@@ -7,6 +7,7 @@ use App\Exceptions\CouponInvalidException;
 use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\StoreOrderRequest;
+use App\Models\Setting;
 use App\Models\ShippingZone;
 use App\Services\CartService;
 use App\Services\CheckoutService;
@@ -42,6 +43,7 @@ class CheckoutController extends Controller
                 'variant_label' => $item->variant->label(),
             ]),
             'subtotal' => $totals['subtotal'],
+            'taxPercent' => (float) (Setting::get('tax_percent') ?? 0),
             'shippingZones' => ShippingZone::where('is_active', true)->orderBy('cost')->get(),
             'addresses' => $request->user()?->addresses()->orderByDesc('is_default')->get() ?? [],
         ]);

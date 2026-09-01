@@ -8,7 +8,10 @@ const page = usePage();
     <div class="min-h-screen bg-gray-50">
         <header class="border-b bg-white">
             <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-                <Link href="/" class="text-lg font-semibold text-gray-900">{{ page.props.storeSettings.name }}</Link>
+                <Link href="/" class="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                    <img v-if="page.props.storeSettings.logoUrl" :src="page.props.storeSettings.logoUrl" class="h-8 w-8 rounded object-cover" />
+                    {{ page.props.storeSettings.name }}
+                </Link>
 
                 <nav class="flex items-center gap-4 text-sm">
                     <Link :href="route('catalog')" class="text-gray-700 hover:text-indigo-600">Produk</Link>

@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,9 +32,11 @@ class SettingController extends Controller
     public function edit(): Response
     {
         $settings = Setting::allCached()->only(self::KEYS);
+        $logoPath = Setting::get('store_logo');
 
         return Inertia::render('Admin/Settings/Edit', [
             'settings' => $settings,
+            'logoUrl' => $logoPath ? Storage::disk('public')->url($logoPath) : null,
         ]);
     }
 
@@ -49,10 +52,20 @@ class SettingController extends Controller
             'bank_account_holder' => ['nullable', 'string', 'max:255'],
             'tax_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'low_stock_threshold' => ['nullable', 'integer', 'min:0'],
+            'logo' => ['nullable', 'image', 'max:1024'],
         ]);
 
-        foreach ($validated as $key => $value) {
+        foreach (self::KEYS as $key) {
+            $value = $validated[$key] ?? null;
             Setting::set($key, $value === null ? null : (string) $value);
+        }
+
+        if ($request->hasFile('logo')) {
+            $oldLogo = Setting::get('store_logo');
+            if ($oldLogo) {
+                Storage::disk('public')->delete($oldLogo);
+            }
+            Setting::set('store_logo', $request->file('logo')->store('settings', 'public'));
         }
 
         ActivityLog::record('settings.update', 'Memperbarui pengaturan toko.');

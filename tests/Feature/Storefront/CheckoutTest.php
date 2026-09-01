@@ -4,6 +4,7 @@ namespace Tests\Feature\Storefront;
 
 use App\Models\Address;
 use App\Models\ProductVariant;
+use App\Models\Setting;
 use App\Models\ShippingZone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -54,6 +55,64 @@ class CheckoutTest extends TestCase
         ]);
         $this->assertDatabaseHas('payments', ['method' => 'manual_transfer', 'status' => 'pending']);
         $this->assertDatabaseCount('cart_items', 0);
+    }
+
+    public function test_tax_is_applied_to_order_total_when_configured(): void
+    {
+        Setting::set('tax_percent', '10');
+
+        $variant = ProductVariant::factory()->create(['stock' => 10, 'price' => 100000]);
+        $zone = ShippingZone::factory()->create(['cost' => 15000, 'is_active' => true]);
+
+        $this->addToCart($variant, 1);
+
+        $response = $this->post(route('checkout.store'), [
+            'recipient_name' => 'Budi',
+            'phone' => '08123456789',
+            'city' => 'Jakarta',
+            'address_line' => 'Jl. Contoh No. 1',
+            'guest_name' => 'Budi',
+            'guest_email' => 'budi@example.com',
+            'guest_phone' => '08123456789',
+            'shipping_zone_id' => $zone->id,
+            'payment_method' => 'manual_transfer',
+        ]);
+
+        $response->assertRedirect();
+
+        // subtotal 100000, pajak 10% = 10000, ongkir 15000 -> total 125000
+        $this->assertDatabaseHas('orders', [
+            'guest_email' => 'budi@example.com',
+            'subtotal' => 100000,
+            'tax' => 10000,
+            'total' => 125000,
+        ]);
+    }
+
+    public function test_no_tax_is_applied_when_tax_percent_is_not_configured(): void
+    {
+        $variant = ProductVariant::factory()->create(['stock' => 10, 'price' => 100000]);
+        $zone = ShippingZone::factory()->create(['cost' => 15000, 'is_active' => true]);
+
+        $this->addToCart($variant, 1);
+
+        $this->post(route('checkout.store'), [
+            'recipient_name' => 'Budi',
+            'phone' => '08123456789',
+            'city' => 'Jakarta',
+            'address_line' => 'Jl. Contoh No. 1',
+            'guest_name' => 'Budi',
+            'guest_email' => 'budi2@example.com',
+            'guest_phone' => '08123456789',
+            'shipping_zone_id' => $zone->id,
+            'payment_method' => 'manual_transfer',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'guest_email' => 'budi2@example.com',
+            'tax' => 0,
+            'total' => 115000,
+        ]);
     }
 
     public function test_checkout_fails_when_stock_is_insufficient(): void

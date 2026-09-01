@@ -26,6 +26,8 @@ use App\Http\Controllers\Customer\DashboardController as CustomerDashboardContro
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ReviewController as CustomerReviewController;
 use App\Http\Controllers\Public\MidtransNotificationController;
+use App\Http\Controllers\Public\RobotsController;
+use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\CouponController;
@@ -40,6 +42,9 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/produk', [StorefrontProductController::class, 'index'])->name('catalog');
 Route::get('/produk/{slug}', [StorefrontProductController::class, 'show'])->name('catalog.show');
 Route::get('/halaman/{slug}', [StorefrontPageController::class, 'show'])->name('page.show');
+
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 
 Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
 Route::post('/keranjang', [CartController::class, 'store'])->name('cart.store');

@@ -11,6 +11,7 @@ use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\ProductVariant;
+use App\Models\Setting;
 use App\Models\ShippingZone;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -84,7 +85,9 @@ class CheckoutService
                 $discount = $coupon->calculateDiscount($subtotal);
             }
 
-            $total = $subtotal - $discount + $shippingZone->cost;
+            $taxPercent = (float) (Setting::get('tax_percent') ?? 0);
+            $tax = round(($subtotal - $discount) * $taxPercent / 100, 2);
+            $total = $subtotal - $discount + $tax + $shippingZone->cost;
 
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
@@ -102,6 +105,7 @@ class CheckoutService
                 'shipping_cost' => $shippingZone->cost,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
+                'tax' => $tax,
                 'total' => $total,
                 'notes' => $notes,
             ]);

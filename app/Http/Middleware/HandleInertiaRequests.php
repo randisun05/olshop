@@ -7,6 +7,7 @@ use App\Models\Page;
 use App\Models\Setting;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -58,6 +59,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'storeSettings' => [
                 'name' => fn () => Setting::get('store_name', 'Toko Online'),
+                'logoUrl' => fn () => Setting::get('store_logo')
+                    ? Storage::disk('public')->url(Setting::get('store_logo'))
+                    : null,
             ],
             'footerPages' => fn () => Page::where('is_active', true)->orderBy('title')->get(['title', 'slug']),
             'recaptchaSiteKey' => config('services.recaptcha.site_key'),

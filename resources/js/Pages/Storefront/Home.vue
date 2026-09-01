@@ -1,14 +1,16 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import Seo from '@/Components/Seo.vue';
 
 defineProps({
     banners: Array,
+    seo: Object,
 });
 </script>
 
 <template>
-    <Head title="Beranda" />
+    <Seo :seo="seo" />
 
     <StorefrontLayout>
         <div v-if="banners.length" class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">

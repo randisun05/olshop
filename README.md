@@ -50,7 +50,7 @@ admin lainnya — ini yang diharapkan (bukan bug), lihat § Pengerasan Keamanan 
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-8)
+## Fitur yang Sudah Tersedia (Fase 0-9)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -101,6 +101,17 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   membalas pertama kali), pesan baru muncul otomatis lewat polling ringan (~4 detik, tanpa
   WebSocket/dependensi eksternal), badge jumlah pesan belum dibaca di kedua sisi, dan mengirim
   pesan baru otomatis membuka kembali percakapan yang sudah ditutup
+- Pajak: field "Pajak (%)" di Pengaturan Toko kini benar-benar dipakai — dihitung otomatis atas
+  (subtotal - diskon) saat checkout, tampil di ringkasan checkout, invoice PDF, detail pesanan
+  (pembeli & admin), dan laporan penjualan
+- Logo toko: unggah logo di Pengaturan Toko, tampil di header storefront dan dipakai sebagai
+  gambar `og:image` bawaan untuk share sosial media
+- SEO: judul, meta description, dan Open Graph tags (`og:title`/`og:description`/`og:image`,
+  `twitter:card`) dirender **di server** (bukan cuma lewat komponen Vue) di beranda, katalog,
+  detail produk, dan halaman statis — supaya preview link WhatsApp/Facebook/Twitter dan crawler
+  tanpa JavaScript tetap menampilkannya dengan benar; `/sitemap.xml` dinamis mendaftarkan produk &
+  halaman aktif, `/robots.txt` dinamis mengarahkan ke sitemap dan memblokir area privat
+  (admin/akun/checkout/dst) dari pengindeksan
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -109,6 +120,12 @@ notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi
 ke `storage/logs/laravel.log`).
 
 Seluruh 7 fase di roadmap `docs/PERENCANAAN.md` § 9 sudah selesai, ditambah Fase 7 (retur/komplain
-& login sosial) dan Fase 8 (chat interaktif) atas permintaan lanjutan — keduanya di luar cakupan
-§ 6 daftar fitur awal. Satu-satunya item yang masih terbuka: ekstensi multi-vendor (skema sudah
-didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).
+& login sosial), Fase 8 (chat interaktif), dan Fase 9 (pajak, logo toko, SEO) atas permintaan
+lanjutan — ketiganya di luar cakupan § 6 daftar fitur awal. Satu-satunya item yang masih terbuka:
+ekstensi multi-vendor (skema sudah didesain agar mudah ditambah tanpa merombak struktur inti —
+lihat § 10).
+
+Yang **bukan** kode dan harus disiapkan sendiri sebelum publish sungguhan: akun Midtrans produksi
+(KYC merchant, saat ini masih sandbox), domain asli + SSL, kredensial SMTP asli (default
+`MAIL_MAILER=log`), isi konten halaman FAQ/Syarat/Kebijakan Privasi (fitur CMS-nya sudah ada,
+tinggal diisi lewat `/admin/pages`), dan data produk sungguhan. Lihat `docs/DEPLOYMENT.md`.

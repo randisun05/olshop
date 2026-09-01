@@ -177,6 +177,9 @@ const submitReview = (item) => {
                     <div v-if="order.discount > 0" class="flex justify-between text-green-600">
                         <span>Diskon</span><span>-{{ formatPrice(order.discount) }}</span>
                     </div>
+                    <div v-if="order.tax > 0" class="flex justify-between">
+                        <span>Pajak</span><span>{{ formatPrice(order.tax) }}</span>
+                    </div>
                     <div class="flex justify-between">
                         <span>Ongkos Kirim ({{ order.shipping_zone_name }})</span>
                         <span>{{ formatPrice(order.shipping_cost) }}</span>

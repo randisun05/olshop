@@ -82,6 +82,12 @@ const cancelOrder = () => {
                     </div>
                     <div class="mt-3 space-y-1 text-sm text-gray-600">
                         <div class="flex justify-between"><span>Subtotal</span><span>{{ formatPrice(order.subtotal) }}</span></div>
+                        <div v-if="order.discount > 0" class="flex justify-between text-green-600">
+                            <span>Diskon</span><span>-{{ formatPrice(order.discount) }}</span>
+                        </div>
+                        <div v-if="order.tax > 0" class="flex justify-between">
+                            <span>Pajak</span><span>{{ formatPrice(order.tax) }}</span>
+                        </div>
                         <div class="flex justify-between">
                             <span>Ongkos Kirim ({{ order.shipping_zone_name }})</span>
                             <span>{{ formatPrice(order.shipping_cost) }}</span>

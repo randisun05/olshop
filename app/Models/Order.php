@@ -36,6 +36,7 @@ class Order extends Model
         'shipping_cost',
         'subtotal',
         'discount',
+        'tax',
         'total',
         'notes',
         'paid_at',

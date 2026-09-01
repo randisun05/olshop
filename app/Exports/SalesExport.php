@@ -22,7 +22,7 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return ['Nomor Pesanan', 'Tanggal', 'Pelanggan', 'Status', 'Subtotal', 'Diskon', 'Ongkir', 'Total'];
+        return ['Nomor Pesanan', 'Tanggal', 'Pelanggan', 'Status', 'Subtotal', 'Diskon', 'Pajak', 'Ongkir', 'Total'];
     }
 
     public function map($order): array
@@ -34,6 +34,7 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping
             $order->status->label(),
             $order->subtotal,
             $order->discount,
+            $order->tax,
             $order->shipping_cost,
             $order->total,
         ];

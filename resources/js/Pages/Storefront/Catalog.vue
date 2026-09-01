@@ -1,12 +1,14 @@
 <script setup>
 import { ref } from 'vue';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import Seo from '@/Components/Seo.vue';
 
 const props = defineProps({
     products: Object,
     categories: Array,
     filters: Object,
+    seo: Object,
 });
 
 const page = usePage();
@@ -46,7 +48,7 @@ const applySort = (event) => {
 </script>
 
 <template>
-    <Head title="Katalog Produk" />
+    <Seo :seo="seo" />
 
     <StorefrontLayout>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-4">

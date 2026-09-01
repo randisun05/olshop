@@ -1,14 +1,15 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import Seo from '@/Components/Seo.vue';
 
 defineProps({
     page: Object,
+    seo: Object,
 });
 </script>
 
 <template>
-    <Head :title="page.title" />
+    <Seo :seo="seo" />
 
     <StorefrontLayout>
         <div class="rounded-lg bg-white p-8 shadow">

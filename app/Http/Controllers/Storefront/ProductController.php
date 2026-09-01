@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\SeoMeta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -54,6 +56,7 @@ class ProductController extends Controller
             'products' => $products,
             'categories' => Category::whereNull('parent_id')->with('children')->where('is_active', true)->orderBy('name')->get(),
             'filters' => $request->only(['q', 'category', 'sort']),
+            'seo' => SeoMeta::make('Katalog Produk', 'Jelajahi katalog lengkap produk kami — cari, filter, dan urutkan sesuai kebutuhan Anda.'),
         ]);
     }
 
@@ -112,6 +115,11 @@ class ProductController extends Controller
                     : false,
             ],
             'related' => $related,
+            'seo' => SeoMeta::make(
+                $product->name,
+                $product->description ? Str::limit(strip_tags($product->description), 160) : "Beli {$product->name} dengan harga terbaik.",
+                $product->images->first()?->url(),
+            ),
         ]);
     }
 }
