@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShippingZoneController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Customer\AddressController;
+use App\Http\Controllers\Customer\ChatController as CustomerChatController;
 use App\Http\Controllers\Customer\ComplaintController as CustomerComplaintController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
@@ -158,6 +160,15 @@ Route::prefix('admin')
             Route::get('/komplain/{complaint}', [AdminComplaintController::class, 'show'])->name('complaints.show');
             Route::post('/komplain/{complaint}/respon', [AdminComplaintController::class, 'respond'])->name('complaints.respond');
         });
+
+        Route::middleware('permission:chat.manage')->group(function () {
+            Route::get('/chat', [AdminChatController::class, 'index'])->name('chat.index');
+            Route::get('/chat/{conversation}', [AdminChatController::class, 'show'])->name('chat.show');
+            Route::post('/chat/{conversation}/pesan', [AdminChatController::class, 'sendMessage'])->middleware('throttle:30,1')->name('chat.message');
+            Route::get('/chat/{conversation}/poll', [AdminChatController::class, 'poll'])->name('chat.poll');
+            Route::post('/chat/{conversation}/tutup', [AdminChatController::class, 'close'])->name('chat.close');
+            Route::post('/chat/{conversation}/buka', [AdminChatController::class, 'reopen'])->name('chat.reopen');
+        });
     });
 
 Route::prefix('akun')
@@ -177,4 +188,11 @@ Route::prefix('akun')
         Route::post('/alamat', [AddressController::class, 'store'])->name('addresses.store');
         Route::put('/alamat/{address}', [AddressController::class, 'update'])->name('addresses.update');
         Route::delete('/alamat/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+
+        Route::get('/chat', [CustomerChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/baru', [CustomerChatController::class, 'create'])->name('chat.create');
+        Route::post('/chat', [CustomerChatController::class, 'store'])->middleware('throttle:10,1')->name('chat.store');
+        Route::get('/chat/{conversation}', [CustomerChatController::class, 'show'])->name('chat.show');
+        Route::post('/chat/{conversation}/pesan', [CustomerChatController::class, 'sendMessage'])->middleware('throttle:30,1')->name('chat.message');
+        Route::get('/chat/{conversation}/poll', [CustomerChatController::class, 'poll'])->name('chat.poll');
     });

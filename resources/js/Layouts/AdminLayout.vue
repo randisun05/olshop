@@ -20,6 +20,7 @@ const nav = [
     { label: 'Kupon', route: 'admin.coupons.index', permission: 'coupons.manage' },
     { label: 'Ulasan', route: 'admin.reviews.index', permission: 'reviews.manage' },
     { label: 'Retur/Komplain', route: 'admin.complaints.index', permission: 'complaints.manage' },
+    { label: 'Chat', route: 'admin.chat.index', permission: 'chat.manage', badge: page.props.unreadChatCount },
     { label: 'Laporan Penjualan', route: 'admin.reports.sales', permission: 'reports.view' },
     { label: 'Produk Terlaris', route: 'admin.reports.top-products', permission: 'reports.view' },
     { label: 'Laporan Stok', route: 'admin.reports.stock', permission: 'reports.view' },
@@ -39,10 +40,13 @@ const nav = [
                     v-for="item in nav"
                     :key="item.route"
                     :href="route(item.route)"
-                    class="block rounded px-3 py-2 text-sm hover:bg-gray-800"
+                    class="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-gray-800"
                     :class="{ 'bg-gray-800 text-white': route().current(item.route.replace('.index', '').concat('.*')) || route().current(item.route) }"
                 >
                     {{ item.label }}
+                    <span v-if="item.badge" class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
+                        {{ item.badge }}
+                    </span>
                 </Link>
             </nav>
         </aside>

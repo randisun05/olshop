@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Conversation;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Services\CartService;
@@ -63,6 +64,11 @@ class HandleInertiaRequests extends Middleware
             'socialProviders' => array_values(array_filter([
                 config('services.google.client_id') ? 'google' : null,
             ])),
+            'unreadChatCount' => fn () => match (true) {
+                ! $user => 0,
+                $user->can('chat.manage') => Conversation::unreadCountForStaff(),
+                default => Conversation::unreadCountForCustomer($user),
+            },
         ]);
     }
 }

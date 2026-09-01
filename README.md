@@ -50,7 +50,7 @@ admin lainnya — ini yang diharapkan (bukan bug), lihat § Pengerasan Keamanan 
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-7)
+## Fitur yang Sudah Tersedia (Fase 0-8)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -96,6 +96,11 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
 - Login sosial: tombol "Masuk/Daftar dengan Google" opsional (tidak aktif tanpa
   `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`) — akun baru otomatis dibuat & email terverifikasi,
   atau ditautkan ke akun existing bila emailnya sudah terdaftar
+- Chat interaktif: pelanggan login bisa mengobrol dengan CS (opsional dikaitkan ke pesanan
+  tertentu), Staff CS/Admin membalas dari kotak masuk bersama (otomatis "ditugaskan" ke staf yang
+  membalas pertama kali), pesan baru muncul otomatis lewat polling ringan (~4 detik, tanpa
+  WebSocket/dependensi eksternal), badge jumlah pesan belum dibaca di kedua sisi, dan mengirim
+  pesan baru otomatis membuka kembali percakapan yang sudah ditutup
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -104,5 +109,6 @@ notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi
 ke `storage/logs/laravel.log`).
 
 Seluruh 7 fase di roadmap `docs/PERENCANAAN.md` § 9 sudah selesai, ditambah Fase 7 (retur/komplain
-& login sosial) atas permintaan lanjutan. Satu-satunya item di § 6 yang masih terbuka: ekstensi
-multi-vendor (skema sudah didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).
+& login sosial) dan Fase 8 (chat interaktif) atas permintaan lanjutan — keduanya di luar cakupan
+§ 6 daftar fitur awal. Satu-satunya item yang masih terbuka: ekstensi multi-vendor (skema sudah
+didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).
