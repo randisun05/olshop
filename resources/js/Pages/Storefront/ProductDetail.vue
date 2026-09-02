@@ -23,6 +23,44 @@ const selectedVariant = computed(() =>
     props.product.variants.find((v) => v.id === selectedVariantId.value)
 );
 
+// Schema.org Product markup — memungkinkan produk tampil sebagai rich result
+// (harga, rating) di hasil pencarian Google. Berbeda dari meta description/
+// Open Graph di Seo.vue (yang butuh render server-side agar terlihat crawler
+// tanpa JS seperti WhatsApp), JSON-LD aman dirender via JS karena Google
+// menjalankan JavaScript saat membaca structured data.
+const jsonLd = computed(() => {
+    const prices = props.product.variants.map((v) => Number(v.price));
+    const inStock = props.product.variants.some((v) => v.stock > 0);
+
+    const data = {
+        '@context': 'https://schema.org/',
+        '@type': 'Product',
+        name: props.product.name,
+        description: props.seo?.description,
+        image: props.product.images.map((img) => img.url),
+        brand: props.product.brand ? { '@type': 'Brand', name: props.product.brand.name } : undefined,
+        offers: {
+            '@type': 'AggregateOffer',
+            priceCurrency: 'IDR',
+            lowPrice: Math.min(...prices),
+            highPrice: Math.max(...prices),
+            availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        },
+    };
+
+    if (props.product.rating_avg) {
+        data.aggregateRating = {
+            '@type': 'AggregateRating',
+            ratingValue: props.product.rating_avg,
+            reviewCount: props.product.reviews_count,
+        };
+    }
+
+    // Escape '<' agar teks produk yang memuat tag penutup script tidak bisa
+    // memutus elemen ini lebih awal saat disisipkan lewat v-html.
+    return JSON.stringify(data).replace(/</g, '\\u003c');
+});
+
 const formatPrice = (value) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 
@@ -50,6 +88,7 @@ const toggleWishlist = () => {
 
 <template>
     <Seo :seo="seo" />
+    <component :is="'script'" type="application/ld+json" v-html="jsonLd" />
 
     <StorefrontLayout>
         <nav class="mb-4 text-sm text-gray-500">
@@ -61,13 +100,14 @@ const toggleWishlist = () => {
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
             <div>
                 <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
-                    <img v-if="activeImage" :src="activeImage" class="h-full w-full object-cover" />
+                    <img v-if="activeImage" :src="activeImage" :alt="product.name" class="h-full w-full object-cover" />
                     <div v-else class="flex h-full items-center justify-center text-gray-400">Tidak ada gambar</div>
                 </div>
                 <div v-if="product.images.length > 1" class="mt-3 flex gap-2">
-                    <button v-for="image in product.images" :key="image.id" @click="activeImage = image.url">
+                    <button v-for="(image, index) in product.images" :key="image.id" @click="activeImage = image.url">
                         <img
                             :src="image.url"
+                            :alt="`${product.name} - gambar ${index + 1}`"
                             class="h-16 w-16 rounded object-cover ring-2"
                             :class="activeImage === image.url ? 'ring-indigo-500' : 'ring-transparent'"
                         />
@@ -169,7 +209,7 @@ const toggleWishlist = () => {
                     class="rounded-lg bg-white p-3 shadow transition hover:shadow-md"
                 >
                     <div class="aspect-square overflow-hidden rounded bg-gray-100">
-                        <img v-if="item.image_url" :src="item.image_url" class="h-full w-full object-cover" />
+                        <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="h-full w-full object-cover" />
                     </div>
                     <h3 class="mt-2 line-clamp-2 text-sm font-medium text-gray-900">{{ item.name }}</h3>
                     <p class="mt-1 text-sm font-semibold text-indigo-600">{{ formatPrice(item.min_price) }}</p>

@@ -123,6 +123,7 @@ const applySort = (event) => {
                                 <img
                                     v-if="product.image_url"
                                     :src="product.image_url"
+                                    :alt="product.name"
                                     class="h-full w-full object-cover transition group-hover:scale-105"
                                 />
                                 <div v-else class="flex h-full items-center justify-center text-xs text-gray-400">

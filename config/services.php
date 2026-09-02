@@ -52,4 +52,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'analytics' => [
+        'google_analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+        'meta_pixel_id' => env('META_PIXEL_ID'),
+    ],
+
 ];

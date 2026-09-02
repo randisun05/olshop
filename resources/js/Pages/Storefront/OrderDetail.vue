@@ -220,7 +220,7 @@ const submitReview = (item) => {
 
             <div v-else-if="order.payment?.proof_url" class="rounded-lg bg-white p-6 shadow">
                 <h2 class="mb-3 font-semibold text-gray-900">Bukti Pembayaran</h2>
-                <img :src="order.payment.proof_url" class="max-w-xs rounded border" />
+                <img :src="order.payment.proof_url" alt="Bukti pembayaran" class="max-w-xs rounded border" />
             </div>
 
             <div class="rounded-lg bg-white p-6 shadow">

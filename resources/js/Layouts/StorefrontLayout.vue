@@ -9,7 +9,12 @@ const page = usePage();
         <header class="border-b bg-white">
             <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
                 <Link href="/" class="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                    <img v-if="page.props.storeSettings.logoUrl" :src="page.props.storeSettings.logoUrl" class="h-8 w-8 rounded object-cover" />
+                    <img
+                        v-if="page.props.storeSettings.logoUrl"
+                        :src="page.props.storeSettings.logoUrl"
+                        :alt="page.props.storeSettings.name"
+                        class="h-8 w-8 rounded object-cover"
+                    />
                     {{ page.props.storeSettings.name }}
                 </Link>
 

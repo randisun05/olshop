@@ -50,7 +50,7 @@ admin lainnya — ini yang diharapkan (bukan bug), lihat § Pengerasan Keamanan 
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-9)
+## Fitur yang Sudah Tersedia (Fase 0-10)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -112,6 +112,12 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   tanpa JavaScript tetap menampilkannya dengan benar; `/sitemap.xml` dinamis mendaftarkan produk &
   halaman aktif, `/robots.txt` dinamis mengarahkan ke sitemap dan memblokir area privat
   (admin/akun/checkout/dst) dari pengindeksan
+- SEO lanjutan & polish publish: atribut `alt` deskriptif di semua gambar storefront (logo, kartu
+  produk, galeri detail produk, keranjang, produk terkait, bukti pembayaran), data terstruktur
+  JSON-LD Schema.org `Product` (harga, ketersediaan, rating) di halaman detail produk untuk rich
+  result Google Search, halaman error 404/500/dst bermerek toko (menggantikan halaman error
+  Laravel bawaan, tetap menampilkan stack trace saat `APP_DEBUG=true`), dan hook Google Analytics
+  (GA4) / Meta Pixel opsional (tidak aktif tanpa `GOOGLE_ANALYTICS_ID`/`META_PIXEL_ID`)
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -120,10 +126,10 @@ notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi
 ke `storage/logs/laravel.log`).
 
 Seluruh 7 fase di roadmap `docs/PERENCANAAN.md` § 9 sudah selesai, ditambah Fase 7 (retur/komplain
-& login sosial), Fase 8 (chat interaktif), dan Fase 9 (pajak, logo toko, SEO) atas permintaan
-lanjutan — ketiganya di luar cakupan § 6 daftar fitur awal. Satu-satunya item yang masih terbuka:
-ekstensi multi-vendor (skema sudah didesain agar mudah ditambah tanpa merombak struktur inti —
-lihat § 10).
+& login sosial), Fase 8 (chat interaktif), Fase 9 (pajak, logo toko, SEO), dan Fase 10 (alt text,
+JSON-LD produk, halaman error bermerek, hook analitik) atas permintaan lanjutan — keempatnya di
+luar cakupan § 6 daftar fitur awal. Satu-satunya item yang masih terbuka: ekstensi multi-vendor
+(skema sudah didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).
 
 Yang **bukan** kode dan harus disiapkan sendiri sebelum publish sungguhan: akun Midtrans produksi
 (KYC merchant, saat ini masih sandbox), domain asli + SSL, kredensial SMTP asli (default

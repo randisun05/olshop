@@ -38,6 +38,7 @@ const removeItem = (item) => {
                         <img
                             v-if="item.variant.product.image_url"
                             :src="item.variant.product.image_url"
+                            :alt="item.variant.product.name"
                             class="h-full w-full object-cover"
                         />
                     </div>
