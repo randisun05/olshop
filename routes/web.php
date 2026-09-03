@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('akun-saya')->name('account.')->group(function () {
         Route::get('/keamanan', [SecurityController::class, 'edit'])->name('security.edit');
+        Route::delete('/keamanan/akun', [SecurityController::class, 'destroyAccount'])->name('security.destroy-account');
     });
 });
 

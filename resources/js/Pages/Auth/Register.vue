@@ -18,6 +18,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     recaptcha_token: '',
+    terms_accepted: false,
 });
 
 onMounted(() => {
@@ -88,6 +89,19 @@ const submit = () => {
                     required
                 />
                 <InputError :message="form.errors.password_confirmation" />
+            </div>
+
+            <div>
+                <label class="flex items-start gap-2 text-sm text-gray-600">
+                    <input v-model="form.terms_accepted" type="checkbox" class="mt-0.5 rounded border-gray-300" />
+                    <span>
+                        Saya setuju dengan
+                        <Link href="/halaman/syarat-ketentuan" target="_blank" class="text-indigo-600 hover:underline">Syarat & Ketentuan</Link>
+                        dan
+                        <Link href="/halaman/kebijakan-privasi" target="_blank" class="text-indigo-600 hover:underline">Kebijakan Privasi</Link>
+                    </span>
+                </label>
+                <InputError :message="form.errors.terms_accepted" />
             </div>
 
             <PrimaryButton class="w-full" :disabled="form.processing">Daftar</PrimaryButton>

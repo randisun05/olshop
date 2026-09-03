@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -35,6 +35,7 @@ const form = useForm({
     payment_method: 'manual_transfer',
     notes: '',
     coupon_code: '',
+    terms_accepted: false,
 });
 
 const selectedZone = computed(() => props.shippingZones.find((z) => z.id === form.shipping_zone_id));
@@ -265,6 +266,18 @@ const submit = () => {
                         <span>{{ formatPrice(total) }}</span>
                     </div>
                 </div>
+                <div>
+                    <label class="flex items-start gap-2 text-xs text-gray-600">
+                        <input v-model="form.terms_accepted" type="checkbox" class="mt-0.5 rounded border-gray-300" />
+                        <span>
+                            Saya setuju dengan
+                            <Link href="/halaman/syarat-ketentuan" target="_blank" class="text-indigo-600 hover:underline">Syarat & Ketentuan</Link>
+                            toko ini
+                        </span>
+                    </label>
+                    <InputError :message="form.errors.terms_accepted" />
+                </div>
+
                 <PrimaryButton class="w-full" :disabled="form.processing">Buat Pesanan</PrimaryButton>
             </div>
         </form>

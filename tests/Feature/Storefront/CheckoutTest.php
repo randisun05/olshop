@@ -23,6 +23,29 @@ class CheckoutTest extends TestCase
         $this->carryGuestSession($response);
     }
 
+    public function test_checkout_requires_accepting_terms(): void
+    {
+        $variant = ProductVariant::factory()->create(['stock' => 10, 'price' => 100000]);
+        $zone = ShippingZone::factory()->create(['cost' => 15000, 'is_active' => true]);
+
+        $this->addToCart($variant, 1);
+
+        $response = $this->post(route('checkout.store'), [
+            'recipient_name' => 'Budi',
+            'phone' => '08123456789',
+            'city' => 'Jakarta',
+            'address_line' => 'Jl. Contoh No. 1',
+            'guest_name' => 'Budi',
+            'guest_email' => 'budi@example.com',
+            'guest_phone' => '08123456789',
+            'shipping_zone_id' => $zone->id,
+            'payment_method' => 'manual_transfer',
+        ]);
+
+        $response->assertSessionHasErrors('terms_accepted');
+        $this->assertSame(10, $variant->fresh()->stock);
+    }
+
     public function test_guest_can_checkout_with_manual_transfer_and_stock_is_reduced(): void
     {
         $variant = ProductVariant::factory()->create(['stock' => 10, 'price' => 100000]);
@@ -40,6 +63,7 @@ class CheckoutTest extends TestCase
             'guest_phone' => '08123456789',
             'shipping_zone_id' => $zone->id,
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ]);
 
         $response->assertRedirect();
@@ -76,6 +100,7 @@ class CheckoutTest extends TestCase
             'guest_phone' => '08123456789',
             'shipping_zone_id' => $zone->id,
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ]);
 
         $response->assertRedirect();
@@ -106,6 +131,7 @@ class CheckoutTest extends TestCase
             'guest_phone' => '08123456789',
             'shipping_zone_id' => $zone->id,
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ]);
 
         $this->assertDatabaseHas('orders', [
@@ -135,6 +161,7 @@ class CheckoutTest extends TestCase
             'guest_phone' => '08123456789',
             'shipping_zone_id' => $zone->id,
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ]);
 
         $response->assertSessionHas('error');
@@ -159,6 +186,7 @@ class CheckoutTest extends TestCase
             'address_id' => $address->id,
             'shipping_zone_id' => $zone->id,
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ]);
 
         $response->assertRedirect();

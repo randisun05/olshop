@@ -150,6 +150,11 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
 - Navigasi mobile: header storefront, akun pelanggan, dan panel admin sekarang punya menu hamburger
   di layar sempit (bukan cuma tampilan desktop yang dipaksakan mengecil) — sidebar admin jadi drawer
   yang bisa ditutup/dibuka, dan tabel-tabel admin bisa di-scroll horizontal alih-alih terpotong
+- Syarat & Ketentuan dan Kebijakan Privasi: kontennya sudah diisi (bukan halaman kosong lagi),
+  wajib disetujui lewat checkbox saat registrasi maupun checkout
+- Hapus akun sendiri: pelanggan bisa menghapus akunnya sendiri lewat halaman Keamanan Akun (perlu
+  konfirmasi password) — riwayat pesanan tetap disimpan untuk pembukuan tapi tidak lagi terhubung ke
+  akun, sementara alamat/wishlist/riwayat chat ikut terhapus. Khusus akun pelanggan, bukan staf
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),

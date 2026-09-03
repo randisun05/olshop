@@ -33,6 +33,7 @@ class CouponTest extends TestCase
             'guest_email' => 'budi@example.com',
             'guest_phone' => '08123456789',
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ], $overrides);
     }
 

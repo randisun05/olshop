@@ -11,6 +11,7 @@ import DangerButton from '@/Components/DangerButton.vue';
 const props = defineProps({
     twoFactorEnabled: Boolean,
     twoFactorRequired: Boolean,
+    canDeleteOwnAccount: Boolean,
 });
 
 const page = usePage();
@@ -61,6 +62,13 @@ const disableTwoFactor = () => {
 const loadRecoveryCodes = async () => {
     recoveryCodes.value = await fetch(route('two-factor.recovery-codes')).then((r) => r.json());
     showRecoveryCodes.value = true;
+};
+
+const showDeleteForm = ref(false);
+const deleteForm = useForm({ password: '' });
+
+const deleteAccount = () => {
+    deleteForm.delete(route('account.security.destroy-account'), { preserveScroll: true });
 };
 </script>
 
@@ -120,6 +128,36 @@ const loadRecoveryCodes = async () => {
                     <p v-for="rc in recoveryCodes" :key="rc">{{ rc }}</p>
                 </div>
             </div>
+        </div>
+
+        <div v-if="canDeleteOwnAccount" class="mt-6 max-w-xl space-y-3 rounded-lg border border-red-200 bg-white p-6 shadow">
+            <h2 class="text-sm font-semibold text-red-700">Hapus Akun</h2>
+            <p class="text-sm text-gray-500">
+                Menghapus akun bersifat permanen: alamat, wishlist, dan riwayat chat Anda akan ikut terhapus.
+                Riwayat pesanan tetap kami simpan untuk keperluan pembukuan, tapi tidak lagi terhubung ke akun Anda.
+            </p>
+
+            <SecondaryButton v-if="!showDeleteForm" @click="showDeleteForm = true">Hapus Akun Saya</SecondaryButton>
+
+            <form v-else @submit.prevent="deleteAccount" class="space-y-3">
+                <div>
+                    <label for="delete_password" class="block text-sm font-medium text-gray-700">
+                        Masukkan kata sandi untuk konfirmasi
+                    </label>
+                    <input
+                        id="delete_password"
+                        v-model="deleteForm.password"
+                        type="password"
+                        autocomplete="current-password"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                    />
+                    <InputError :message="deleteForm.errors.password" />
+                </div>
+                <div class="flex gap-3">
+                    <DangerButton :disabled="deleteForm.processing">Hapus Akun Permanen</DangerButton>
+                    <SecondaryButton type="button" @click="showDeleteForm = false; deleteForm.reset()">Batal</SecondaryButton>
+                </div>
+            </form>
         </div>
     </component>
 </template>

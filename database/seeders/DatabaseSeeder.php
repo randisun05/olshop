@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             CouponSeeder::class,
             SettingSeeder::class,
             FaqSeeder::class,
+            LegalPagesSeeder::class,
         ]);
     }
 }

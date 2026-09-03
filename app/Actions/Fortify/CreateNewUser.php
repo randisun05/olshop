@@ -34,6 +34,9 @@ class CreateNewUser implements CreatesNewUsers
             ],
             'password' => $this->passwordRules(),
             'recaptcha_token' => ['nullable', 'string', new Recaptcha],
+            'terms_accepted' => ['accepted'],
+        ], [
+            'terms_accepted.accepted' => 'Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi untuk mendaftar.',
         ])->validate();
 
         $user = User::create([

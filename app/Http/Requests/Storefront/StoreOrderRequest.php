@@ -41,6 +41,17 @@ class StoreOrderRequest extends FormRequest
             'payment_method' => ['required', Rule::in(['midtrans', 'manual_transfer'])],
             'notes' => ['nullable', 'string', 'max:1000'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
+            'terms_accepted' => ['accepted'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'terms_accepted.accepted' => 'Anda harus menyetujui Syarat & Ketentuan untuk melanjutkan checkout.',
         ];
     }
 }

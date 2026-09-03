@@ -36,6 +36,7 @@ class StockNotificationTest extends TestCase
             'guest_phone' => '08123456789',
             'shipping_zone_id' => $zone->id,
             'payment_method' => 'manual_transfer',
+            'terms_accepted' => true,
         ]);
 
         $response->assertRedirect();
