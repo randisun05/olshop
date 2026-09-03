@@ -50,7 +50,7 @@ admin lainnya — ini yang diharapkan (bukan bug), lihat § Pengerasan Keamanan 
 
 Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN.md`.
 
-## Fitur yang Sudah Tersedia (Fase 0-10)
+## Fitur yang Sudah Tersedia (Fase 0-11)
 
 - Autentikasi lengkap (register, verifikasi email, login, reset password, 2FA/passkeys)
 - RBAC granular via role + permission (Super Admin, Admin, Staff Gudang, Staff CS, Customer)
@@ -118,6 +118,21 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   result Google Search, halaman error 404/500/dst bermerek toko (menggantikan halaman error
   Laravel bawaan, tetap menampilkan stack trace saat `APP_DEBUG=true`), dan hook Google Analytics
   (GA4) / Meta Pixel opsional (tidak aktif tanpa `GOOGLE_ANALYTICS_ID`/`META_PIXEL_ID`)
+- Manajemen user/staf: Super Admin bisa menambah, mengubah role, dan menonaktifkan akun staf
+  (Admin/Staff Gudang/Staff CS) lewat `/admin/users` — akun nonaktif langsung ditolak saat login;
+  ada proteksi supaya tidak bisa menonaktifkan diri sendiri atau Super Admin aktif terakhir
+- Notifikasi in-app: bell di header admin (polling ringan tiap 20 detik) memberi tahu staf
+  berpermission `orders.manage` saat ada pesanan baru dan staf berpermission `products.manage`
+  saat stok varian melewati ambang batas menipis, lengkap dengan tandai (semua) sudah dibaca
+- Kartu stok: setiap perubahan stok (keluar/masuk karena pesanan, atau penyesuaian manual oleh
+  admin dengan alasan) tercatat sebagai riwayat di `/admin/kartu-stok`, termasuk form untuk
+  mencatat penyesuaian manual (mis. barang rusak/hilang atau retur dari supplier)
+- Cookie consent banner: banner persetujuan cookie di storefront (hanya muncul kalau Google
+  Analytics/Meta Pixel dikonfigurasi) — skrip analitik baru benar-benar dimuat setelah pengunjung
+  menekan "Terima", bukan otomatis di setiap kunjungan
+- Impor data massal: admin bisa impor kategori, brand, dan produk sederhana (satu varian per
+  produk) lewat file Excel/CSV di `/admin/impor`, lengkap dengan tombol unduh contoh format untuk
+  tiap jenis data dan laporan baris mana saja yang gagal beserta alasannya
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),
@@ -126,10 +141,11 @@ notifikasi sungguhan, isi `MAIL_MAILER` dkk di `.env` (default `log`, notifikasi
 ke `storage/logs/laravel.log`).
 
 Seluruh 7 fase di roadmap `docs/PERENCANAAN.md` § 9 sudah selesai, ditambah Fase 7 (retur/komplain
-& login sosial), Fase 8 (chat interaktif), Fase 9 (pajak, logo toko, SEO), dan Fase 10 (alt text,
-JSON-LD produk, halaman error bermerek, hook analitik) atas permintaan lanjutan — keempatnya di
-luar cakupan § 6 daftar fitur awal. Satu-satunya item yang masih terbuka: ekstensi multi-vendor
-(skema sudah didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).
+& login sosial), Fase 8 (chat interaktif), Fase 9 (pajak, logo toko, SEO), Fase 10 (alt text,
+JSON-LD produk, halaman error bermerek, hook analitik), dan Fase 11 (manajemen user/staf,
+notifikasi in-app, kartu stok, cookie consent, impor data massal) atas permintaan lanjutan —
+kelimanya di luar cakupan § 6 daftar fitur awal. Satu-satunya item yang masih terbuka: ekstensi
+multi-vendor (skema sudah didesain agar mudah ditambah tanpa merombak struktur inti — lihat § 10).
 
 Yang **bukan** kode dan harus disiapkan sendiri sebelum publish sungguhan: akun Midtrans produksi
 (KYC merchant, saat ini masih sandbox), domain asli + SSL, kredensial SMTP asli (default

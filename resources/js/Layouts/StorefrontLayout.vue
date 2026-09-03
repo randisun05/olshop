@@ -1,5 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
+import CookieConsentBanner from '@/Components/CookieConsentBanner.vue';
 
 const page = usePage();
 </script>
@@ -65,5 +66,7 @@ const page = usePage();
                 </nav>
             </div>
         </footer>
+
+        <CookieConsentBanner v-if="page.props.analyticsEnabled" />
     </div>
 </template>

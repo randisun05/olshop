@@ -39,6 +39,17 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 
+    protected function createSuperAdminUser(): User
+    {
+        $this->seed(RoleSeeder::class);
+        $this->seed(PermissionSeeder::class);
+
+        $user = User::factory()->create(['two_factor_confirmed_at' => now()]);
+        $user->assignRole('Super Admin');
+
+        return $user;
+    }
+
     protected function createCustomerUser(): User
     {
         $this->seed(RoleSeeder::class);

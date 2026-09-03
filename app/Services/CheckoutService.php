@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\StockAdjustmentType;
 use App\Exceptions\CouponInvalidException;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Cart;
@@ -13,6 +14,7 @@ use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Models\Setting;
 use App\Models\ShippingZone;
+use App\Models\StockAdjustment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -36,7 +38,9 @@ class CheckoutService
         ?string $notes = null,
         ?string $couponCode = null,
     ): Order {
-        return DB::transaction(function () use ($cart, $shippingAddress, $shippingZone, $paymentMethod, $user, $guest, $notes, $couponCode) {
+        $stockBeforeByVariant = [];
+
+        $order = DB::transaction(function () use ($cart, $shippingAddress, $shippingZone, $paymentMethod, $user, $guest, $notes, $couponCode, &$stockBeforeByVariant) {
             $cart->loadMissing('items');
 
             if ($cart->items->isEmpty()) {
@@ -69,6 +73,7 @@ class CheckoutService
                     'subtotal' => $lineSubtotal,
                 ];
 
+                $stockBeforeByVariant[$variant->id] = $variant->stock;
                 $variant->decrement('stock', $cartItem->quantity);
             }
 
@@ -112,6 +117,13 @@ class CheckoutService
 
             foreach ($orderItemsData as $itemData) {
                 $order->items()->create($itemData);
+
+                StockAdjustment::log(
+                    ProductVariant::find($itemData['product_variant_id']),
+                    StockAdjustmentType::OrderOut,
+                    -$itemData['quantity'],
+                    "Pesanan {$order->order_number}",
+                );
             }
 
             if ($coupon) {
@@ -131,6 +143,14 @@ class CheckoutService
 
             return $order->load('items', 'payment');
         });
+
+        StockNotifier::notifyNewOrder($order);
+
+        foreach ($stockBeforeByVariant as $variantId => $stockBefore) {
+            StockNotifier::checkLowStock(ProductVariant::find($variantId), $stockBefore);
+        }
+
+        return $order;
     }
 
     public function restoreStock(Order $order): void
@@ -139,6 +159,12 @@ class CheckoutService
             foreach ($order->items as $item) {
                 if ($item->product_variant_id) {
                     ProductVariant::whereKey($item->product_variant_id)->increment('stock', $item->quantity);
+                    StockAdjustment::log(
+                        $item->variant ?? ProductVariant::find($item->product_variant_id),
+                        StockAdjustmentType::OrderRestock,
+                        $item->quantity,
+                        "Pengembalian stok pesanan {$order->order_number}",
+                    );
                 }
             }
         });

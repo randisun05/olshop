@@ -73,6 +73,10 @@ class HandleInertiaRequests extends Middleware
                 $user->can('chat.manage') => Conversation::unreadCountForStaff(),
                 default => Conversation::unreadCountForCustomer($user),
             },
+            'unreadNotificationCount' => fn () => $user?->hasAnyRole(['Super Admin', 'Admin', 'Staff Gudang', 'Staff CS'])
+                ? $user->unreadNotifications()->count()
+                : 0,
+            'analyticsEnabled' => (bool) (config('services.analytics.google_analytics_id') || config('services.analytics.meta_pixel_id')),
         ]);
     }
 }

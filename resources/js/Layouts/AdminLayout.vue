@@ -1,5 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
+import NotificationBell from '@/Components/NotificationBell.vue';
 
 const page = usePage();
 
@@ -24,9 +25,12 @@ const nav = [
     { label: 'Laporan Penjualan', route: 'admin.reports.sales', permission: 'reports.view' },
     { label: 'Produk Terlaris', route: 'admin.reports.top-products', permission: 'reports.view' },
     { label: 'Laporan Stok', route: 'admin.reports.stock', permission: 'reports.view' },
+    { label: 'Kartu Stok', route: 'admin.stock-adjustments.index', permission: 'products.manage' },
     { label: 'Banner', route: 'admin.banners.index', permission: 'banners.manage' },
     { label: 'Halaman', route: 'admin.pages.index', permission: 'pages.manage' },
+    { label: 'Impor Data', route: 'admin.imports.index', permission: 'products.manage' },
     { label: 'Pengaturan', route: 'admin.settings.edit', permission: 'settings.manage' },
+    { label: 'Pengguna Staf', route: 'admin.users.index', role: 'Super Admin' },
     { label: 'Log Aktivitas', route: 'admin.activity-logs.index', role: 'Super Admin' },
 ].filter((item) => hasPermission(item.permission) && hasRole(item.role));
 </script>
@@ -55,6 +59,7 @@ const nav = [
             <header class="flex items-center justify-between border-b bg-white px-6 py-4">
                 <h1 class="text-base font-semibold text-gray-800"><slot name="title">Admin</slot></h1>
                 <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <NotificationBell />
                     <span>{{ page.props.auth.user?.name }}</span>
                     <Link :href="route('account.security.edit')" class="hover:text-indigo-600">Keamanan</Link>
                     <Link :href="route('logout')" method="post" as="button" class="text-red-600 hover:underline">

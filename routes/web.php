@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ImportController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
@@ -18,6 +20,8 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShippingZoneController;
+use App\Http\Controllers\Admin\StockAdjustmentController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Customer\AddressController;
 use App\Http\Controllers\Customer\ChatController as CustomerChatController;
@@ -89,6 +93,10 @@ Route::prefix('admin')
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
+        Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifikasi/baca-semua', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+        Route::post('/notifikasi/{notification}/baca', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
+
         Route::middleware('permission:categories.manage')->group(function () {
             Route::resource('categories', CategoryController::class)->except('show');
         });
@@ -103,6 +111,17 @@ Route::prefix('admin')
 
         Route::middleware('permission:products.manage')->group(function () {
             Route::resource('products', AdminProductController::class)->except('show');
+
+            Route::get('/kartu-stok', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
+            Route::post('/kartu-stok', [StockAdjustmentController::class, 'store'])->name('stock-adjustments.store');
+
+            Route::prefix('impor')->name('imports.')->group(function () {
+                Route::get('/', [ImportController::class, 'index'])->name('index');
+                Route::get('/template/{type}', [ImportController::class, 'template'])->name('template');
+                Route::post('/kategori', [ImportController::class, 'categories'])->name('categories');
+                Route::post('/brand', [ImportController::class, 'brands'])->name('brands');
+                Route::post('/produk', [ImportController::class, 'products'])->name('products');
+            });
         });
 
         Route::middleware('permission:shipping.manage')->group(function () {
@@ -158,6 +177,9 @@ Route::prefix('admin')
 
         Route::middleware('role:Super Admin')->group(function () {
             Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+
+            Route::resource('users', AdminUserController::class)->except(['show', 'destroy']);
+            Route::post('/users/{user}/toggle-aktif', [AdminUserController::class, 'toggleActive'])->name('users.toggle-active');
         });
 
         Route::middleware('permission:complaints.manage')->group(function () {
