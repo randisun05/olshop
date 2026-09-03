@@ -73,7 +73,11 @@ return [
     |
     */
 
-    'home' => '/home',
+    // Default paket ('/home') tidak pernah didaftarkan di routes/web.php —
+    // halaman utama toko ada di '/'. '/dashboard' otomatis mengarahkan ke
+    // admin.dashboard atau customer.dashboard sesuai role, ini yang benar
+    // dituju setelah login/reset password berhasil (lihat routes/web.php).
+    'home' => '/dashboard',
 
     /*
     |--------------------------------------------------------------------------

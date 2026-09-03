@@ -30,6 +30,7 @@ const destroy = (category) => {
         </div>
 
         <div class="overflow-hidden rounded-lg bg-white shadow">
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
                     <tr>
@@ -68,6 +69,7 @@ const destroy = (category) => {
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </AdminLayout>
 </template>

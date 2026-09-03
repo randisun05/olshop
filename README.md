@@ -147,6 +147,9 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   otomatis membalas pertanyaan pelanggan di chat sebelum staf sempat merespons — berhenti otomatis
   begitu percakapan ditugaskan ke staf manusia. Entri FAQ (pertanyaan, jawaban, kata kunci) bisa
   dikelola Staff CS/Admin di `/admin/faq`
+- Navigasi mobile: header storefront, akun pelanggan, dan panel admin sekarang punya menu hamburger
+  di layar sempit (bukan cuma tampilan desktop yang dipaksakan mengecil) — sidebar admin jadi drawer
+  yang bisa ditutup/dibuka, dan tabel-tabel admin bisa di-scroll horizontal alih-alih terpotong
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),

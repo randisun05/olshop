@@ -72,6 +72,7 @@ const destroy = (product) => {
         </div>
 
         <div class="overflow-hidden rounded-lg bg-white shadow">
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
                     <tr>
@@ -114,6 +115,7 @@ const destroy = (product) => {
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
 
         <div class="mt-4 flex flex-wrap gap-1">

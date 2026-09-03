@@ -17,6 +17,7 @@ const formatPrice = (value) =>
         <h1 class="mb-6 text-lg font-semibold text-gray-900">Pesanan Saya</h1>
 
         <div class="overflow-hidden rounded-lg bg-white shadow">
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
                     <tr>
@@ -46,6 +47,7 @@ const formatPrice = (value) =>
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </CustomerLayout>
 </template>
