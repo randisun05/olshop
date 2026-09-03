@@ -88,6 +88,17 @@ class ImportManagementTest extends TestCase
         $this->assertDatabaseMissing('products', ['slug' => 'rak-serbaguna-3-susun']);
     }
 
+    public function test_import_rejects_a_file_larger_than_the_size_limit(): void
+    {
+        $admin = $this->createAdminUser();
+
+        $response = $this->actingAs($admin)->post(route('admin.imports.categories'), [
+            'file' => UploadedFile::fake()->create('kategori.xlsx', 5121),
+        ]);
+
+        $response->assertSessionHasErrors('file');
+    }
+
     public function test_customer_cannot_access_import_page(): void
     {
         $customer = $this->createCustomerUser();

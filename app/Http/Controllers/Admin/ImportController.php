@@ -36,7 +36,7 @@ class ImportController extends Controller
 
     public function categories(Request $request): RedirectResponse
     {
-        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv']]);
+        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
 
         $import = new CategoriesImport;
         Excel::import($import, $request->file('file'));
@@ -48,7 +48,7 @@ class ImportController extends Controller
 
     public function brands(Request $request): RedirectResponse
     {
-        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv']]);
+        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
 
         $import = new BrandsImport;
         Excel::import($import, $request->file('file'));
@@ -60,7 +60,7 @@ class ImportController extends Controller
 
     public function products(Request $request): RedirectResponse
     {
-        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv']]);
+        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
 
         $import = new ProductsImport;
         Excel::import($import, $request->file('file'));
