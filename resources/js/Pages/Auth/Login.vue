@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -7,6 +8,7 @@ import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const page = usePage();
+const siteKey = page.props.recaptchaSiteKey;
 const socialProviders = page.props.socialProviders ?? [];
 const providerLabels = { google: 'Google' };
 
@@ -14,9 +16,30 @@ const form = useForm({
     email: '',
     password: '',
     remember: false,
+    recaptcha_token: '',
+});
+
+onMounted(() => {
+    if (!siteKey) return;
+
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+    document.head.appendChild(script);
 });
 
 const submit = () => {
+    if (siteKey && window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+            window.grecaptcha.execute(siteKey, { action: 'login' }).then((token) => {
+                form.recaptcha_token = token;
+                form.post(route('login'), {
+                    onFinish: () => form.reset('password'),
+                });
+            });
+        });
+        return;
+    }
+
     form.post(route('login'), {
         onFinish: () => form.reset('password'),
     });

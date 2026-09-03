@@ -89,7 +89,7 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   `/akun-saya/keamanan`, otomatis diarahkan ke sana sampai diaktifkan), log aktivitas admin untuk
   aksi kritikal (hapus produk/kupon/banner/halaman, verifikasi/tolak pembayaran, batalkan pesanan,
   ubah pengaturan toko — bisa dilihat Super Admin di `/admin/log-aktivitas`), dan hook reCAPTCHA v3
-  opsional di form registrasi (tidak aktif tanpa `RECAPTCHA_SECRET_KEY`)
+  opsional di form registrasi **dan login** (tidak aktif tanpa `RECAPTCHA_SECRET_KEY`)
 - Retur/komplain: pelanggan bisa mengajukan retur/komplain (dengan foto bukti opsional) untuk
   pesanan yang sudah selesai, satu pengajuan terbuka per pesanan, admin/Staff CS meninjau &
   merespons (proses/selesai/tolak + catatan) dan pelanggan mendapat notifikasi email
@@ -133,6 +133,14 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
 - Impor data massal: admin bisa impor kategori, brand, dan produk sederhana (satu varian per
   produk) lewat file Excel/CSV di `/admin/impor`, lengkap dengan tombol unduh contoh format untuk
   tiap jenis data dan laporan baris mana saja yang gagal beserta alasannya
+- Notifikasi asinkron: semua notifikasi (email & in-app) di-queue (`ShouldQueue`), tidak lagi
+  memblokir siklus request — **queue worker wajib dijalankan** di produksi
+  (`php artisan queue:work --tries=3 --daemon`, lihat `docs/DEPLOYMENT.md` § 6)
+- Alur gudang: Staff Gudang punya permission terbatas (`orders.fulfill`) untuk melihat pesanan,
+  menandai diproses/dikirim, dan mencetak surat jalan — tanpa bisa verifikasi pembayaran,
+  menyelesaikan, atau membatalkan pesanan (tetap khusus Admin/Staff CS via `orders.manage`).
+  Surat jalan (`/admin/pesanan/{order}/surat-jalan`) adalah dokumen PDF terpisah dari invoice,
+  berisi alamat & daftar barang tanpa harga, untuk kebutuhan pengemasan
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),

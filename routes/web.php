@@ -162,15 +162,22 @@ Route::prefix('admin')
             Route::get('/stok/export/excel', [ReportController::class, 'stockExportExcel'])->name('stock.export.excel');
         });
 
+        // Staff Gudang (orders.fulfill) hanya boleh melihat pesanan, menandai
+        // diproses/dikirim, dan mencetak surat jalan — verifikasi pembayaran,
+        // menyelesaikan, dan membatalkan pesanan tetap khusus orders.manage.
+        Route::middleware('permission:orders.manage|orders.fulfill')->group(function () {
+            Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('orders.index');
+            Route::get('/pesanan/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+            Route::get('/pesanan/{order}/surat-jalan', [AdminOrderController::class, 'packingSlip'])->name('orders.packing-slip');
+            Route::post('/pesanan/{order}/proses', [AdminOrderController::class, 'markProcessing'])->name('orders.process');
+            Route::post('/pesanan/{order}/kirim', [AdminOrderController::class, 'markShipped'])->name('orders.ship');
+        });
+
         Route::middleware('permission:orders.manage')->group(function () {
             Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
             Route::post('/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('payments.verify');
             Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
 
-            Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('orders.index');
-            Route::get('/pesanan/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
-            Route::post('/pesanan/{order}/proses', [AdminOrderController::class, 'markProcessing'])->name('orders.process');
-            Route::post('/pesanan/{order}/kirim', [AdminOrderController::class, 'markShipped'])->name('orders.ship');
             Route::post('/pesanan/{order}/selesai', [AdminOrderController::class, 'markCompleted'])->name('orders.complete');
             Route::post('/pesanan/{order}/batal', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
         });

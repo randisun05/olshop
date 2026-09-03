@@ -6,12 +6,16 @@ const page = usePage();
 
 const permissions = page.props.auth.user?.permissions ?? [];
 const roles = page.props.auth.user?.roles ?? [];
-const hasPermission = (name) => !name || permissions.includes(name);
+const hasPermission = (name) => {
+    if (!name) return true;
+    const names = Array.isArray(name) ? name : [name];
+    return names.some((n) => permissions.includes(n));
+};
 const hasRole = (name) => !name || roles.includes(name);
 
 const nav = [
     { label: 'Dashboard', route: 'admin.dashboard' },
-    { label: 'Pesanan', route: 'admin.orders.index', permission: 'orders.manage' },
+    { label: 'Pesanan', route: 'admin.orders.index', permission: ['orders.manage', 'orders.fulfill'] },
     { label: 'Produk', route: 'admin.products.index', permission: 'products.manage' },
     { label: 'Kategori', route: 'admin.categories.index', permission: 'categories.manage' },
     { label: 'Brand', route: 'admin.brands.index', permission: 'brands.manage' },

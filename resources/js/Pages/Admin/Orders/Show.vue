@@ -1,16 +1,20 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 
 const props = defineProps({
     order: Object,
 });
+
+const page = usePage();
+const canManageOrders = (page.props.auth.user?.permissions ?? []).includes('orders.manage');
 
 const formatPrice = (value) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
@@ -124,6 +128,14 @@ const cancelOrder = () => {
                 <div class="rounded-lg bg-white p-6 shadow">
                     <h2 class="mb-3 font-semibold text-gray-900">Aksi</h2>
 
+                    <a
+                        v-if="!['pending_payment', 'cancelled'].includes(order.status)"
+                        :href="route('admin.orders.packing-slip', order.order_number)"
+                        class="mb-3 block"
+                    >
+                        <SecondaryButton class="w-full justify-center">Cetak Surat Jalan</SecondaryButton>
+                    </a>
+
                     <div v-if="order.status === 'paid'">
                         <PrimaryButton class="w-full" @click="markProcessing">Tandai Diproses</PrimaryButton>
                     </div>
@@ -142,17 +154,24 @@ const cancelOrder = () => {
                         <PrimaryButton class="w-full" :disabled="shipForm.processing">Tandai Dikirim</PrimaryButton>
                     </form>
 
-                    <div v-else-if="order.status === 'shipped'">
+                    <div v-else-if="order.status === 'shipped' && canManageOrders">
                         <p class="mb-3 text-sm text-gray-600">
                             {{ order.shipment?.courier }} — {{ order.shipment?.tracking_number }}
                         </p>
                         <PrimaryButton class="w-full" @click="markCompleted">Tandai Selesai</PrimaryButton>
                     </div>
 
+                    <p
+                        v-else-if="order.status === 'shipped'"
+                        class="text-sm text-gray-600"
+                    >
+                        {{ order.shipment?.courier }} — {{ order.shipment?.tracking_number }}
+                    </p>
+
                     <p v-else class="text-sm text-gray-500">Tidak ada aksi tersedia untuk status ini.</p>
 
                     <DangerButton
-                        v-if="!['shipped', 'completed', 'cancelled'].includes(order.status)"
+                        v-if="canManageOrders && !['shipped', 'completed', 'cancelled'].includes(order.status)"
                         class="mt-3 w-full justify-center"
                         @click="cancelOrder"
                     >

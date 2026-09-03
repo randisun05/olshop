@@ -26,6 +26,10 @@ class PermissionSeeder extends Seeder
             'products.manage',
             'shipping.manage',
             'orders.manage',
+            // Subset dari orders.manage: hanya lihat pesanan, tandai
+            // diproses/dikirim, dan cetak surat jalan — dipakai Staff Gudang
+            // yang tidak boleh verifikasi pembayaran/selesaikan/batalkan pesanan.
+            'orders.fulfill',
             'coupons.manage',
             'reviews.manage',
             'reports.view',
@@ -47,7 +51,7 @@ class PermissionSeeder extends Seeder
         $admin->syncPermissions($permissions);
 
         $staffGudang = Role::findByName('Staff Gudang', 'web');
-        $staffGudang->syncPermissions(['products.manage']);
+        $staffGudang->syncPermissions(['products.manage', 'orders.fulfill']);
 
         $staffCs = Role::findByName('Staff CS', 'web');
         $staffCs->syncPermissions(['orders.manage', 'reviews.manage', 'complaints.manage', 'chat.manage']);

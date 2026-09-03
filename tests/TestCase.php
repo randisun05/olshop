@@ -50,6 +50,17 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 
+    protected function createStaffGudangUser(): User
+    {
+        $this->seed(RoleSeeder::class);
+        $this->seed(PermissionSeeder::class);
+
+        $user = User::factory()->create(['two_factor_confirmed_at' => now()]);
+        $user->assignRole('Staff Gudang');
+
+        return $user;
+    }
+
     protected function createCustomerUser(): User
     {
         $this->seed(RoleSeeder::class);
