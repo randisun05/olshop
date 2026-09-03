@@ -124,19 +124,24 @@ di-throttle 60 request/menit untuk mencegah banjir notifikasi.
 
 ## 6. Queue & Notifikasi Email
 
-Saat ini semua notifikasi (perubahan status pesanan) dikirim **sinkron**
-dalam siklus request (belum memakai `ShouldQueue`), jadi **tidak ada queue
-worker yang wajib dijalankan** untuk fitur berjalan normal. Konfigurasi
-`QUEUE_CONNECTION=database` sudah disiapkan sebagai titik ekstensi bila nanti
-notifikasi/import Excel dipindah ke background job (lihat
-`docs/PERENCANAAN.md` § 10) — saat itu terjadi, jalankan:
+Semua notifikasi (`App\Notifications\*`: update status pesanan, update
+komplain, pesanan baru, stok menipis) memakai `ShouldQueue`, jadi **queue
+worker wajib dijalankan** di produksi — tanpanya email/notifikasi in-app
+tidak akan pernah terkirim (job hanya menumpuk di tabel `jobs`, tidak
+dijalankan otomatis). Jalankan:
 
 ```bash
 php artisan queue:work --tries=3 --daemon
 ```
 
-di bawah supervisor (systemd/Supervisor) agar otomatis restart bila crash.
-Karena belum ada job antrean, ini bisa dilewati untuk saat ini.
+di bawah supervisor (systemd/Supervisor) agar otomatis restart bila crash
+atau server reboot. Setelah deploy kode baru, restart worker (`php artisan
+queue:restart`) supaya proses lama yang masih memakai kode versi sebelumnya
+berhenti dan digantikan yang baru.
+
+Di lingkungan development/testing, `QUEUE_CONNECTION=sync` (lihat
+`phpunit.xml`) atau menjalankan `php artisan queue:work` manual sudah cukup
+— job langsung dieksekusi tanpa perlu proses worker terpisah.
 
 ## 7. Backup
 

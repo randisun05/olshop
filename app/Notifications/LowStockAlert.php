@@ -3,10 +3,14 @@
 namespace App\Notifications;
 
 use App\Models\ProductVariant;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class LowStockAlert extends Notification
+class LowStockAlert extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(public ProductVariant $variant) {}
 
     /**
