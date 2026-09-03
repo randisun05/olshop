@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -202,6 +203,14 @@ Route::prefix('admin')
             Route::get('/chat/{conversation}/poll', [AdminChatController::class, 'poll'])->name('chat.poll');
             Route::post('/chat/{conversation}/tutup', [AdminChatController::class, 'close'])->name('chat.close');
             Route::post('/chat/{conversation}/buka', [AdminChatController::class, 'reopen'])->name('chat.reopen');
+        });
+
+        // Entri FAQ dipakai chatbot otomatis (App\Services\ChatBotResponder)
+        // untuk membalas pertanyaan umum di chat pelanggan sebelum staf sempat
+        // membalas — bisa dikelola Staff CS (chat.manage) atau pengelola konten
+        // (pages.manage).
+        Route::middleware('permission:chat.manage|pages.manage')->group(function () {
+            Route::resource('faq', FaqController::class)->except('show');
         });
     });
 

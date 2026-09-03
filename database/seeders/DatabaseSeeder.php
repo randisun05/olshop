@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             ShippingZoneSeeder::class,
             CouponSeeder::class,
             SettingSeeder::class,
+            FaqSeeder::class,
         ]);
     }
 }

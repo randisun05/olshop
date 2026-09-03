@@ -63,7 +63,7 @@ const sendMessage = async () => {
             body: JSON.stringify({ body: body.value }),
         });
         const data = await response.json();
-        messages.value.push(data.message);
+        messages.value.push(...data.messages);
         body.value = '';
         scrollToBottom();
     } finally {

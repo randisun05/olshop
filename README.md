@@ -141,6 +141,12 @@ Detail prinsip arsitektur (Service layer, Policy, dsb.) ada di `docs/PERENCANAAN
   menyelesaikan, atau membatalkan pesanan (tetap khusus Admin/Staff CS via `orders.manage`).
   Surat jalan (`/admin/pesanan/{order}/surat-jalan`) adalah dokumen PDF terpisah dari invoice,
   berisi alamat & daftar barang tanpa harga, untuk kebutuhan pengemasan
+- FAQ & chatbot otomatis: halaman FAQ publik (`/halaman/faq`) berisi konten nyata seputar cara
+  order, pembayaran, ongkir, lacak pesanan, retur, spesifikasi produk, dan keunggulan toko. Konten
+  yang sama dipakai chatbot sederhana berbasis kata kunci (`App\Services\ChatBotResponder`) yang
+  otomatis membalas pertanyaan pelanggan di chat sebelum staf sempat merespons — berhenti otomatis
+  begitu percakapan ditugaskan ke staf manusia. Entri FAQ (pertanyaan, jawaban, kata kunci) bisa
+  dikelola Staff CS/Admin di `/admin/faq`
 
 Untuk mengaktifkan Midtrans, isi `MIDTRANS_SERVER_KEY` dan `MIDTRANS_CLIENT_KEY` di `.env`
 dengan kredensial sandbox/production dari [Midtrans Dashboard](https://dashboard.midtrans.com/),

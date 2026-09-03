@@ -26,6 +26,7 @@ const nav = [
     { label: 'Ulasan', route: 'admin.reviews.index', permission: 'reviews.manage' },
     { label: 'Retur/Komplain', route: 'admin.complaints.index', permission: 'complaints.manage' },
     { label: 'Chat', route: 'admin.chat.index', permission: 'chat.manage', badge: page.props.unreadChatCount },
+    { label: 'FAQ Chatbot', route: 'admin.faq.index', permission: ['chat.manage', 'pages.manage'] },
     { label: 'Laporan Penjualan', route: 'admin.reports.sales', permission: 'reports.view' },
     { label: 'Produk Terlaris', route: 'admin.reports.top-products', permission: 'reports.view' },
     { label: 'Laporan Stok', route: 'admin.reports.stock', permission: 'reports.view' },

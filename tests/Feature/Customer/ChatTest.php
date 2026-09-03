@@ -3,6 +3,7 @@
 namespace Tests\Feature\Customer;
 
 use App\Models\Conversation;
+use App\Models\FaqEntry;
 use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -74,8 +75,8 @@ class ChatTest extends TestCase
         ]);
 
         $response->assertOk();
-        $response->assertJsonPath('message.body', 'Halo, ada update?');
-        $response->assertJsonPath('message.is_mine', true);
+        $response->assertJsonPath('messages.0.body', 'Halo, ada update?');
+        $response->assertJsonPath('messages.0.is_mine', true);
         $this->assertDatabaseHas('chat_messages', ['conversation_id' => $conversation->id, 'body' => 'Halo, ada update?']);
     }
 
@@ -87,6 +88,38 @@ class ChatTest extends TestCase
         $this->actingAs($customer)->postJson(route('customer.chat.message', $conversation), ['body' => 'Masih ada masalah.']);
 
         $this->assertSame('open', $conversation->fresh()->status->value);
+    }
+
+    public function test_bot_auto_replies_when_starting_a_conversation_with_a_matching_question(): void
+    {
+        FaqEntry::factory()->create(['answer' => 'Cek nomor resi di halaman Lacak Pesanan.', 'keywords' => 'resi, lacak']);
+
+        $customer = $this->createCustomerUser();
+
+        $response = $this->actingAs($customer)->post(route('customer.chat.store'), [
+            'subject' => 'Tanya resi',
+            'message' => 'Nomor resi saya berapa ya?',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('chat_messages', ['body' => 'Cek nomor resi di halaman Lacak Pesanan.']);
+    }
+
+    public function test_bot_auto_replies_via_send_message_endpoint(): void
+    {
+        FaqEntry::factory()->create(['answer' => 'Kami terima transfer bank dan Midtrans.', 'keywords' => 'bayar, pembayaran']);
+
+        $customer = $this->createCustomerUser();
+        $conversation = Conversation::factory()->create(['user_id' => $customer->id]);
+
+        $response = $this->actingAs($customer)->postJson(route('customer.chat.message', $conversation), [
+            'body' => 'Metode pembayaran apa saja?',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonCount(2, 'messages');
+        $response->assertJsonPath('messages.1.body', 'Kami terima transfer bank dan Midtrans.');
+        $response->assertJsonPath('messages.1.is_mine', false);
     }
 
     public function test_poll_only_returns_messages_after_given_id(): void

@@ -6,6 +6,7 @@ use App\Enums\ConversationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
 use App\Models\Conversation;
+use App\Services\ChatBotResponder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use Inertia\Response;
 
 class ChatController extends Controller
 {
+    public function __construct(private readonly ChatBotResponder $chatBot) {}
+
     public function index(Request $request): Response
     {
         $conversations = $request->user()->conversations()
@@ -63,6 +66,8 @@ class ChatController extends Controller
             'body' => $validated['message'],
         ]);
 
+        $this->chatBot->respond($conversation, $validated['message']);
+
         return redirect()->route('customer.chat.show', $conversation)->with('success', 'Pesan terkirim, tim kami akan segera membalas.');
     }
 
@@ -96,8 +101,14 @@ class ChatController extends Controller
             'customer_read_at' => now(),
         ]);
 
+        $botMessage = $this->chatBot->respond($conversation, $validated['body']);
+
         return response()->json([
-            'message' => $this->transformMessages($conversation, $request->user()->id, collect([$message]))[0],
+            'messages' => $this->transformMessages(
+                $conversation,
+                $request->user()->id,
+                collect(array_filter([$message, $botMessage]))
+            ),
         ]);
     }
 
